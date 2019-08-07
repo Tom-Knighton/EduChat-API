@@ -15,6 +15,9 @@ namespace EduChatAPI.Objects
         public string UserSchool { get; set; }
         public string UserGender { get; set; }
         public DateTime UserDOB { get; set; }
+        public bool IsModerator { get; set; }
+        public bool IsAdmin { get; set; }
+        public bool IsDeleted { get; set; }
         public string UserPassHash { get; set; }
     }
 }
