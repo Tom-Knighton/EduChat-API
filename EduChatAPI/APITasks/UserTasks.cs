@@ -62,7 +62,7 @@ namespace EduChatAPI.APITasks
             //IsUsernameFree and IsEmailFree should be checked from the application first, UploadProfilePicture should have already run
             await conn.OpenAsync();
             MySqlCommand cmd = new MySqlCommand($"INSERT INTO user VALUES (0, '{usr.UserEmail}', '{usr.UserName}', '{usr.UserFullName}', '{usr.UserProfilePictureURL}', '{usr.UserSchool}', '{usr.UserGender}'," +
-                $"'{usr.UserDOB}', {usr.IsModerator}', {usr.IsAdmin}, {usr.IsDeleted}, '{usr.UserPassHash}');", conn); //Inserts the row into the table 
+                $"'{usr.UserDOB}', {usr.IsModerator}, {usr.IsAdmin}, {usr.IsDeleted}, '{usr.UserPassHash}');", conn); //Inserts the row into the table 
             await cmd.ExecuteNonQueryAsync(); //awaits the execution of the above statement
             int id = (int)cmd.LastInsertedId; // The UserId is autoincremented, and we need to get the value it just inserted as an integer
             conn.Close(); //CLoses the connection
