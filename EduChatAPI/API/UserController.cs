@@ -14,6 +14,15 @@ namespace EduChatAPI.API
     [ApiController]
     public class UserController : ControllerBase
     {
+
+
+        [HttpPost("AuthenticateUser")] //Post request so we can upload a body
+        public async Task<IActionResult> AuthenticateUser([FromBody] AuthenticatingUser usr) //expects authenticatinguser in body
+        {
+            User user = await new UserTasks().AuthenticateUser(usr); //Runs AuthenticateUser task
+            if (user == null) return NotFound(); //returns not found (404) if the user is null
+            else return Ok(user); //else, returns 200 with the user in json
+        }
         
         [HttpGet("GetUserById/{userid}")] //Sets the name of the GET request
         public async Task<IActionResult> GetUserById(int userid) //returns a http status code with information

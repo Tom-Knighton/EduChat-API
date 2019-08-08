@@ -57,6 +57,24 @@ namespace EduChatAPI.APITasks
 
         }
 
+        public async Task<User> AuthenticateUser(AuthenticatingUser usr)
+        {
+            await conn.OpenAsync();
+            MySqlDataReader reader = new MySqlCommand($"SELECT UserId FROM user WHERE (UserName='{usr.Authenticator}' AND UserPassHash='{usr.PassHash}')" +
+                $" OR (UserEmail='{usr.Authenticator}' AND UserPassHash='{usr.PassHash}');", conn).ExecuteReader(); //The select command gets the UserId from the row where either the email and password match,
+            //or the username and password match
+           
+            if (reader.Read())
+            {
+                int id = Convert.ToInt32(reader["UserId"]);
+                Debug.WriteLine(id);
+                conn.Close();
+                return await GetUserById(id);
+            } //Gets the user from the ID returned
+            else { conn.Close(); return null; } //returns null if not found
+
+        }
+
         public async Task<User> CreateNewUser(User usr)
         {
             //IsUsernameFree and IsEmailFree should be checked from the application first, UploadProfilePicture should have already run
