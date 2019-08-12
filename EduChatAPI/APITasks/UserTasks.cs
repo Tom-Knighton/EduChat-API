@@ -105,6 +105,7 @@ namespace EduChatAPI.APITasks
             await conn.OpenAsync();
             MySqlCommand cmd = new MySqlCommand($"UPDATE user SET UserProfilePictureURL='{url}' WHERE UserId={UserId};", conn);
             await cmd.ExecuteNonQueryAsync();
+            conn.Close();
             return await GetUserById(UserId);
         }
     }
