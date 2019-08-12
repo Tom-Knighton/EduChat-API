@@ -96,6 +96,7 @@ namespace EduChatAPI.APITasks
             {
                 await file.CopyToAsync(stream); //Creates the file at the filePath;
             }
+            conn.Close();
             return await EditUserProfilePic(UserId, $"https://cdn.tomk.online/ProfilePics/{UserId}/{file.FileName}"); //Returns the new user with the url to the file we just created
         }
 
