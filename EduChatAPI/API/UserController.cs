@@ -54,7 +54,7 @@ namespace EduChatAPI.API
         {
             if (HttpContext.Request.Form.Files.Count > 0) //The body must contain at least 1 file
             {
-                return Ok(await new UserTasks().UploadProfilePicture(HttpContext.Request.Form.Files[0], userid)); //Returns success (200) with the new string
+                return Ok(await new UserTasks().UploadProfilePicture(HttpContext.Request.Form.Files[0], userid)); //Returns success (200) with the new user
             }
             else return BadRequest(); //Else, returns code 400, bad request
         }

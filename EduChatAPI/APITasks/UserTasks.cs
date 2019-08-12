@@ -88,7 +88,7 @@ namespace EduChatAPI.APITasks
             return usr; //We return the original user with the new user id - it is now in the database
         }
 
-        public async Task<string> UploadProfilePicture(IFormFile file, int UserId) //Takes an IFormFile and UserId
+        public async Task<User> UploadProfilePicture(IFormFile file, int UserId) //Takes an IFormFile and UserId
         {
             Directory.CreateDirectory($"/var/www/cdn/ProfilePics/{UserId}/"); //Creates the folder for the user under the cdn directory
             var filePath = $"/var/www/cdn/ProfilePics/{UserId}/{file.FileName}"; //Sets the file path, consisting of the directory above and the actual file name
@@ -96,7 +96,15 @@ namespace EduChatAPI.APITasks
             {
                 await file.CopyToAsync(stream); //Creates the file at the filePath;
             }
-            return $"https://cdn.tomk.online/ProfilePics/{UserId}/{file.FileName}"; //Returns the url to the file we just created
+            return await EditUserProfilePic(UserId, $"https://cdn.tomk.online/ProfilePics/{UserId}/{file.FileName}"); //Returns the new user with the url to the file we just created
+        }
+
+        public async Task<User> EditUserProfilePic(int UserId, string url)
+        {
+            await conn.OpenAsync();
+            MySqlCommand cmd = new MySqlCommand($"UPDATE user SET UserProfilePictureURL='{url}' WHERE UserId={UserId};", conn);
+            await cmd.ExecuteNonQueryAsync();
+            return await GetUserById(UserId);
         }
     }
 }
