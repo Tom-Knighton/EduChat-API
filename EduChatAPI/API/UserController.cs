@@ -59,5 +59,12 @@ namespace EduChatAPI.API
             else return BadRequest(); //Else, returns code 400, bad request
         }
 
+
+        [HttpPost("SubscribeUserToSubjects/{UserId}")]
+        public async Task<IActionResult> SubscribeUserToSubjects(int UserId, [FromBody] List<int> SubjectIds)
+        {
+            return Ok(await new UserTasks().SubscripeUserToSubjects(UserId, SubjectIds));
+        }
+
     }
 }

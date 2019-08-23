@@ -19,5 +19,8 @@ namespace EduChatAPI.Objects
         public bool IsAdmin { get; set; }
         public bool IsDeleted { get; set; }
         public string UserPassHash { get; set; }
+
+        public List<Subject> Subjects { get; set; }
+        
     }   
 }

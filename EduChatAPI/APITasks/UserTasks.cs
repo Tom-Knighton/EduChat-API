@@ -41,13 +41,13 @@ namespace EduChatAPI.APITasks
             MySqlDataReader reader = new MySqlCommand($"SELECT * FROM user WHERE `UserId`={UserId}", conn).ExecuteReader(); //Executes the select command, looking for a record with a matching UserID
             if (reader.Read() && !Convert.ToBoolean(reader["IsDeleted"])) //If a record exists
             {        
-
                 User usr=  new User
                 {
                     UserId = Convert.ToInt32(reader["UserId"]), UserEmail = reader["UserEmail"].ToString(), UserName = reader["UserName"].ToString(),
                     UserFullName = reader["UserFullName"].ToString(), UserGender = reader["UserGender"].ToString(), UserDOB = Convert.ToDateTime(reader["UserDOB"]),
                     UserProfilePictureURL = reader["UserProfilePictureURL"].ToString(), UserSchool = reader["UserSchool"].ToString(), IsModerator = Convert.ToBoolean(reader["IsModerator"]),
-                    IsAdmin = Convert.ToBoolean(reader["IsAdmin"]), IsDeleted = Convert.ToBoolean(reader["IsDeleted"]), UserPassHash = reader["UserPassHash"].ToString()
+                    IsAdmin = Convert.ToBoolean(reader["IsAdmin"]), IsDeleted = Convert.ToBoolean(reader["IsDeleted"]), UserPassHash = reader["UserPassHash"].ToString(),
+                    Subjects = await new SubjectTasks().GetSubscribedSubjects(UserId)
                 }; //Returns the user object populated with the data from the mysql database
                 conn.Close();
                 return usr;
@@ -77,6 +77,7 @@ namespace EduChatAPI.APITasks
 
         public async Task<User> CreateNewUser(User usr)
         {
+            Debug.WriteLine(usr.ToString());
             //IsUsernameFree and IsEmailFree should be checked from the application first, UploadProfilePicture should have already run
             await conn.OpenAsync();
             MySqlCommand cmd = new MySqlCommand($"INSERT INTO user VALUES (0, '{usr.UserEmail}', '{usr.UserName}', '{usr.UserFullName}', '{usr.UserProfilePictureURL}', '{usr.UserSchool}', '{usr.UserGender}'," +
@@ -105,6 +106,21 @@ namespace EduChatAPI.APITasks
             await conn.OpenAsync();
             MySqlCommand cmd = new MySqlCommand($"UPDATE user SET UserProfilePictureURL='{url}' WHERE UserId={UserId};", conn);
             await cmd.ExecuteNonQueryAsync();
+            conn.Close();
+            return await GetUserById(UserId);
+        }
+
+
+
+
+        public async Task<User>SubscripeUserToSubjects(int UserId, List<int> SubjectIds)
+        {
+            await conn.OpenAsync();
+            foreach (int id in SubjectIds)
+            {
+                MySqlCommand cmd = new MySqlCommand($"INSERT INTO subject_enrollment VALUES ({UserId}, {id}, 1) ON DUPLICATE KEY UPDATE UserId = VALUES(UserId), SubjectId = VALUES(SubjectId), IsEnabled = VALUES(IsEnabled);", conn);
+                cmd.ExecuteNonQuery();
+            }
             conn.Close();
             return await GetUserById(UserId);
         }
