@@ -7,6 +7,7 @@ namespace EduChatAPI.Objects
     {
         public int SubjectId { get; set; }
         public string SubjectName { get; set; }
+        public string ShortSubjectName { get; set; }
         public bool IsEducational { get; set; }
         public bool IsAdvanced { get; set; }
         public bool IsEnabled { get; set; }

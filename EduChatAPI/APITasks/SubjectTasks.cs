@@ -25,6 +25,7 @@ namespace EduChatAPI.APITasks
                 {
                     SubjectId = Convert.ToInt32(reader["SubjectId"]),
                     SubjectName = reader["SubjectName"].ToString(),
+                    ShortSubjectName = reader["ShortSubjectName"].ToString(),
                     IsEducational = Convert.ToBoolean(reader["IsEducational"]),
                     IsAdvanced = Convert.ToBoolean(reader["IsAdvanced"]),
                     IsEnabled = Convert.ToBoolean(reader["IsEnabled"])
@@ -46,6 +47,7 @@ namespace EduChatAPI.APITasks
                 {
                     SubjectId = Convert.ToInt32(reader["SubjectId"]),
                     SubjectName = reader["SubjectName"].ToString(),
+                    ShortSubjectName = reader["ShortSubjectName"].ToString(),
                     IsEducational = Convert.ToBoolean(reader["IsEducational"]),
                     IsAdvanced = Convert.ToBoolean(reader["IsAdvanced"]),
                     IsEnabled = Convert.ToBoolean(reader["IsEnabled"])
@@ -65,6 +67,7 @@ namespace EduChatAPI.APITasks
                 {
                     SubjectId = Convert.ToInt32(reader["SubjectId"]),
                     SubjectName = reader["SubjectName"].ToString(),
+                    ShortSubjectName = reader["ShortSubjectName"].ToString(),
                     IsEducational = Convert.ToBoolean(reader["IsEducational"]),
                     IsAdvanced = Convert.ToBoolean(reader["IsAdvanced"]),
                     IsEnabled = Convert.ToBoolean(reader["IsEnabled"])
