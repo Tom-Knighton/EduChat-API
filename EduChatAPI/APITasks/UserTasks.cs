@@ -124,5 +124,17 @@ namespace EduChatAPI.APITasks
             conn.Close();
             return await GetUserById(UserId);
         }
+
+        public async Task<User>UnsubscribeUserToSubjects(int UserId, List<int> SubjectIds)
+        {
+            await conn.OpenAsync();
+            foreach (int id in SubjectIds)
+            {
+                MySqlCommand cmd = new MySqlCommand($"INSERT INTO subject_enrollment VALUES ({UserId}, {id}, 0) ON DUPLICATE KEY UPDATE UserId = VALUES(UserId), SubjectId = VALUES(SubjectId), IsEnabled = VALUES(IsEnabled);", conn);
+                cmd.ExecuteNonQuery();
+            }
+            conn.Close();
+            return await GetUserById(UserId);
+        }
     }
 }

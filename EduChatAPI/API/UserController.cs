@@ -65,6 +65,11 @@ namespace EduChatAPI.API
         {
             return Ok(await new UserTasks().SubscripeUserToSubjects(UserId, SubjectIds));
         }
+        [HttpPost("UnsubscribeUserToSubjects/{UserId}")]
+        public async Task<IActionResult> UnsubscribeUserToSubjects(int UserId, [FromBody] List<int> SubjectIds)
+        {
+            return Ok(await new UserTasks().UnsubscribeUserToSubjects(UserId, SubjectIds));
+        }
 
     }
 }
