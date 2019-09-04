@@ -77,7 +77,6 @@ namespace EduChatAPI.APITasks
 
         public async Task<User> CreateNewUser(User usr)
         {
-            Debug.WriteLine(usr.ToString());
             //IsUsernameFree and IsEmailFree should be checked from the application first, UploadProfilePicture should have already run
             await conn.OpenAsync();
             MySqlCommand cmd = new MySqlCommand($"INSERT INTO user VALUES (0, '{usr.UserEmail}', '{usr.UserName}', '{usr.UserFullName}', '{usr.UserProfilePictureURL}', '{usr.UserSchool}', '{usr.UserGender}'," +
@@ -99,6 +98,17 @@ namespace EduChatAPI.APITasks
             }
             conn.Close();
             return await EditUserProfilePic(UserId, $"https://cdn.tomk.online/ProfilePics/{UserId}/{file.FileName}"); //Returns the new user with the url to the file we just created
+        }
+
+        public async Task<User> ModifyUser(int id, User usr)
+        {
+            await conn.OpenAsync();
+            MySqlCommand cmd = new MySqlCommand($"UPDATE user SET `UserEmail` = '{usr.UserEmail}', `UserName` = '{usr.UserName}', `UserFullName` = '{usr.UserFullName}'," +
+                $" `UserProfilePictureURL` = '{usr.UserProfilePictureURL}', `UserSchool` = '{usr.UserSchool}', `UserGender` = '{usr.UserGender}', `UserDOB` = '{usr.UserDOB.ToString("yyyy-MM-dd hh:mm:ss")}'," +
+                $" `IsModerator` = {usr.IsModerator}, `IsAdmin` = {usr.IsAdmin}, `IsDeleted` = {usr.IsDeleted}, `UserPassHash` = '{usr.UserPassHash}' WHERE (`UserId` = {id})", conn);
+            await cmd.ExecuteNonQueryAsync();
+            conn.Close();
+            return await GetUserById(id);
         }
 
         public async Task<User> EditUserProfilePic(int UserId, string url)
