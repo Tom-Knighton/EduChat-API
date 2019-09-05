@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EduChatAPI.Hubs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -33,6 +34,7 @@ namespace EduChatAPI
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddSignalR();
             services.AddSwaggerGen(c => c.SwaggerDoc("V1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "EduChat API", Version = "V1" } ));
            
         }
@@ -54,6 +56,10 @@ namespace EduChatAPI
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<ChatHub>("/ChatHub");
+            });
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
