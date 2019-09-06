@@ -55,7 +55,7 @@ namespace EduChatAPI
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-
+            app.UseWebSockets();
             app.UseSignalR(routes =>
             {
               
