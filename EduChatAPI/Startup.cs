@@ -34,7 +34,7 @@ namespace EduChatAPI
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddSignalR();
+            services.AddSignalR(e => e.EnableDetailedErrors = true);
             services.AddSwaggerGen(c => c.SwaggerDoc("V1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "EduChat API", Version = "V1" } ));
            
         }
@@ -58,6 +58,7 @@ namespace EduChatAPI
 
             app.UseSignalR(routes =>
             {
+              
                 routes.MapHub<ChatHub>("/ChatHub");
             });
             app.UseSwagger();

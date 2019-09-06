@@ -6,9 +6,9 @@ namespace EduChatAPI.Hubs
 {
     public class ChatHub : Hub
     {
-        public async Task SendTestMessage(string message)
+        public async Task SendTestMessage(string user, string message)
         {
-            await Clients.All.SendAsync("RecieveTestMessage", message);
+            await Clients.All.SendAsync("RecieveTestMessage", user, message);
             //Sends the message back to all connected clients
         }
     }
