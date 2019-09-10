@@ -20,7 +20,7 @@ namespace EduChatAPI.APITasks
 
         public async Task<bool> IsUsernameFree(string username)
         {
-            await conn.OpenAsync(); //Opens the conenection to the database
+            if (conn.State != System.Data.ConnectionState.Open) { await conn.OpenAsync(); } //Opens the conenection to the database
             MySqlDataReader reader = new MySqlCommand($"SELECT * FROM user WHERE UserName='{username}' AND IsDeleted = 0", conn).ExecuteReader(); //Selects all where username matches the one we're checking
             if (reader.Read()) { conn.Close(); return false; } //If it finds any, return false and close the connection
             else { conn.Close(); return true; } //Else, close the connection and return true
@@ -28,7 +28,7 @@ namespace EduChatAPI.APITasks
 
         public async Task<bool> IsEmailFree(string email)
         {
-            await conn.OpenAsync(); //Opens the conenection to the database
+            if (conn.State != System.Data.ConnectionState.Open) { await conn.OpenAsync(); } //Opens the conenection to the database
             MySqlDataReader reader = new MySqlCommand($"SELECT * FROM user WHERE UserEmail='{email}' AND IsDeleted = 0 ", conn).ExecuteReader(); //Selects all where UserEmail matches the one we're checking
             if (reader.Read()) { conn.Close(); return false; } //If it finds any, return false and close the connection
             else { conn.Close(); return true; } //Else, close the connection and return true
@@ -37,7 +37,7 @@ namespace EduChatAPI.APITasks
 
         public async Task<User> GetUserById(int UserId)
         {
-            await conn.OpenAsync(); //Opens the connection the the mysql database 
+            if (conn.State != System.Data.ConnectionState.Open) { await conn.OpenAsync(); } //Opens the connection the the mysql database 
             MySqlDataReader reader = new MySqlCommand($"SELECT * FROM user WHERE `UserId`={UserId}", conn).ExecuteReader(); //Executes the select command, looking for a record with a matching UserID
             if (reader.Read() && !Convert.ToBoolean(reader["IsDeleted"])) //If a record exists
             {        
@@ -59,7 +59,7 @@ namespace EduChatAPI.APITasks
 
         public async Task<User> AuthenticateUser(AuthenticatingUser usr)
         {
-            await conn.OpenAsync();
+            if (conn.State != System.Data.ConnectionState.Open) { await conn.OpenAsync(); }
             MySqlDataReader reader = new MySqlCommand($"SELECT UserId FROM user WHERE (UserName='{usr.Authenticator}' AND UserPassHash='{usr.PassHash}')" +
                 $" OR (UserEmail='{usr.Authenticator}' AND UserPassHash='{usr.PassHash}');", conn).ExecuteReader(); //The select command gets the UserId from the row where either the email and password match,
             //or the username and password match
@@ -78,7 +78,7 @@ namespace EduChatAPI.APITasks
         public async Task<User> CreateNewUser(User usr)
         {
             //IsUsernameFree and IsEmailFree should be checked from the application first, UploadProfilePicture should have already run
-            await conn.OpenAsync();
+            if (conn.State != System.Data.ConnectionState.Open) { await conn.OpenAsync(); }
             MySqlCommand cmd = new MySqlCommand($"INSERT INTO user VALUES (0, '{usr.UserEmail}', '{usr.UserName}', '{usr.UserFullName}', '{usr.UserProfilePictureURL}', '{usr.UserSchool}', '{usr.UserGender}'," +
                 $"'{usr.UserDOB.ToString("yyyy-MM-dd hh:mm:ss")}', {usr.IsModerator}, {usr.IsAdmin}, {usr.IsDeleted}, '{usr.UserPassHash}');", conn); //Inserts the row into the table 
             await cmd.ExecuteNonQueryAsync(); //awaits the execution of the above statement
@@ -102,7 +102,7 @@ namespace EduChatAPI.APITasks
 
         public async Task<User> ModifyUser(int id, User usr)
         {
-            await conn.OpenAsync();
+            if (conn.State != System.Data.ConnectionState.Open) { await conn.OpenAsync(); }
             MySqlCommand cmd = new MySqlCommand($"UPDATE user SET `UserEmail` = '{usr.UserEmail}', `UserName` = '{usr.UserName}', `UserFullName` = '{usr.UserFullName}'," +
                 $" `UserProfilePictureURL` = '{usr.UserProfilePictureURL}', `UserSchool` = '{usr.UserSchool}', `UserGender` = '{usr.UserGender}', `UserDOB` = '{usr.UserDOB.ToString("yyyy-MM-dd hh:mm:ss")}'," +
                 $" `IsModerator` = {usr.IsModerator}, `IsAdmin` = {usr.IsAdmin}, `IsDeleted` = {usr.IsDeleted}, `UserPassHash` = '{usr.UserPassHash}' WHERE (`UserId` = {id})", conn);
@@ -113,7 +113,7 @@ namespace EduChatAPI.APITasks
 
         public async Task<User> EditUserProfilePic(int UserId, string url)
         {
-            await conn.OpenAsync();
+            if (conn.State != System.Data.ConnectionState.Open) { await conn.OpenAsync(); }
             MySqlCommand cmd = new MySqlCommand($"UPDATE user SET UserProfilePictureURL='{url}' WHERE UserId={UserId};", conn);
             await cmd.ExecuteNonQueryAsync();
             conn.Close();
@@ -125,7 +125,7 @@ namespace EduChatAPI.APITasks
 
         public async Task<User>SubscripeUserToSubjects(int UserId, List<int> SubjectIds)
         {
-            await conn.OpenAsync();
+            if (conn.State != System.Data.ConnectionState.Open) { await conn.OpenAsync(); }
             foreach (int id in SubjectIds)
             {
                 MySqlCommand cmd = new MySqlCommand($"INSERT INTO subject_enrollment VALUES ({UserId}, {id}, 1) ON DUPLICATE KEY UPDATE UserId = VALUES(UserId), SubjectId = VALUES(SubjectId), IsEnabled = VALUES(IsEnabled);", conn);
@@ -137,7 +137,7 @@ namespace EduChatAPI.APITasks
 
         public async Task<User>UnsubscribeUserToSubjects(int UserId, List<int> SubjectIds)
         {
-            await conn.OpenAsync();
+            if (conn.State != System.Data.ConnectionState.Open) { await conn.OpenAsync(); }
             foreach (int id in SubjectIds)
             {
                 MySqlCommand cmd = new MySqlCommand($"INSERT INTO subject_enrollment VALUES ({UserId}, {id}, 0) ON DUPLICATE KEY UPDATE UserId = VALUES(UserId), SubjectId = VALUES(SubjectId), IsEnabled = VALUES(IsEnabled);", conn);

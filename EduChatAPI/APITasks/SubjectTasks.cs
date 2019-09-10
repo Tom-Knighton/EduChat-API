@@ -13,7 +13,7 @@ namespace EduChatAPI.APITasks
         public async Task<List<Subject>> GetAllSubjects(bool excludeAlevels, bool excludeNonEdu)
         {
             List<Subject> subjects = new List<Subject>();
-            await conn.OpenAsync();
+            if (conn.State != System.Data.ConnectionState.Open) { await conn.OpenAsync(); }
             string sqlString = $"SELECT * FROM subject WHERE IsEnabled=1";
             if (excludeAlevels) sqlString += " AND IsAdvanced = 0";
             if (excludeNonEdu) sqlString += " AND IsEducational = 1";
@@ -38,7 +38,7 @@ namespace EduChatAPI.APITasks
         public async Task<List<Subject>> GetSubscribedSubjects(int Userid)
         {
             List<Subject> subjects = new List<Subject>();
-            await conn.OpenAsync();
+            if (conn.State != System.Data.ConnectionState.Open) { await conn.OpenAsync(); }
             string sqlString = $"SELECT * FROM subject_enrollment INNER JOIN subject ON subject_enrollment.SubjectId = subject.SubjectId WHERE subject_enrollment.UserId = {Userid} AND subject_enrollment.IsEnabled = 1;";
             MySqlDataReader reader = new MySqlCommand($"{sqlString}", conn).ExecuteReader();
             while (reader.Read())
@@ -59,7 +59,7 @@ namespace EduChatAPI.APITasks
 
         public async Task<Subject> GetSubjectById(int id)
         {
-            await conn.OpenAsync();
+            if (conn.State != System.Data.ConnectionState.Open) { await conn.OpenAsync(); }
             MySqlDataReader reader = new MySqlCommand($"SELECT * FROM subject WHERE SubjectId={id};", conn).ExecuteReader();
             if (reader.Read())
             {
