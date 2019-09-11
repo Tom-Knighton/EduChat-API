@@ -21,6 +21,7 @@ namespace EduChatAPI.Objects
         public string UserPassHash { get; set; }
 
         public List<Subject> Subjects { get; set; }
+        public List<Chat> Chats { get; set; }
         
     }   
 }
