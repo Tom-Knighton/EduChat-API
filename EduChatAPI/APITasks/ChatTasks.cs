@@ -61,7 +61,7 @@ namespace EduChatAPI.APITasks
                             ChatId = Convert.ToInt32(reader["chatId"]),
                             UserId = Convert.ToInt32(reader["userId"]),
                             isInChat = Convert.ToBoolean(reader["isInChat"]),
-                            user = await new UserTasks().GetUserById(Convert.ToInt32(reader["userId"]))
+                            user = await new UserTasks().GetUserById(Convert.ToInt32(reader["userId"]), flatten: true)
                         });
                     }
                 return members;

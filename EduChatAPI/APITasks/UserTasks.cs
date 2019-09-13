@@ -58,8 +58,8 @@ namespace EduChatAPI.APITasks
                             UserFullName = reader["UserFullName"].ToString(), UserGender = reader["UserGender"].ToString(), UserDOB = Convert.ToDateTime(reader["UserDOB"]),
                             UserProfilePictureURL = reader["UserProfilePictureURL"].ToString(), UserSchool = reader["UserSchool"].ToString(), IsModerator = Convert.ToBoolean(reader["IsModerator"]),
                             IsAdmin = Convert.ToBoolean(reader["IsAdmin"]), IsDeleted = Convert.ToBoolean(reader["IsDeleted"]), UserPassHash = reader["UserPassHash"].ToString(),
-                            Subjects = flatten ? await new SubjectTasks().GetSubscribedSubjects(UserId) : null,
-                            Chats = flatten ? await new ChatTasks().GetAllChatsForUser(UserId) : null
+                            Subjects = !flatten ? await new SubjectTasks().GetSubscribedSubjects(UserId) : null,
+                            Chats = !flatten ? await new ChatTasks().GetAllChatsForUser(UserId) : null
                         };
                     }
                     else return null;
@@ -79,20 +79,21 @@ namespace EduChatAPI.APITasks
                     
             }
         }
-
+        
         public async Task<User> CreateNewUser(User usr)
         {
-            using (var conn = new MySqlConnection(connString))
+            using (var conn = new MySqlConnection(connString)) //Creates a connection that will be destroyed once scope ends
             {
-                await conn.OpenAsync();
-                using (var cmd = new MySqlCommand())
+                await conn.OpenAsync(); //Waits for the connection to open
+                using (var cmd = new MySqlCommand()) //Creates comman that will be destroyed once scope ends
                 {
-                    cmd.Connection = conn;
+                    cmd.Connection = conn; //Sets command's connection to our connection
                     cmd.CommandText = $"INSERT INTO user VALUES (0, '{usr.UserEmail}', '{usr.UserName}', '{usr.UserFullName}', '{usr.UserProfilePictureURL}', '{usr.UserSchool}', '{usr.UserGender}'," +
                     $"'{usr.UserDOB.ToString("yyyy-MM-dd hh:mm:ss")}', {usr.IsModerator}, {usr.IsAdmin}, {usr.IsDeleted}, '{usr.UserPassHash}');";
-                    await cmd.ExecuteNonQueryAsync();
-                    int id = (int)cmd.LastInsertedId;
-                    usr.UserId = id; return usr;
+                    // ^ the SQL statement to insert the user
+                    await cmd.ExecuteNonQueryAsync(); //Waits for the command to execute
+                    int id = (int)cmd.LastInsertedId; //Gets the auto incremented Id from that last insertion
+                    usr.UserId = id; return usr; //Sets the user object's id to the above, and returns the user
                 }
             }
         }
