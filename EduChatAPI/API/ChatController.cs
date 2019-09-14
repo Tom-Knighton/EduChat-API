@@ -23,5 +23,15 @@ namespace EduChatAPI.API
         {
             return Ok(await new ChatTasks().GetAllChatsForUser(UserId));
         }
+        [HttpGet("GetMessagesForChat/{ChatId}")]
+        public async Task<IActionResult> GetMessagesForChat(int ChatId)
+        {
+            return Ok(await new ChatTasks().GetMessagesForChat(ChatId));
+        }
+        [HttpGet("GetChatMessagesId/{MessageId}")]
+        public async Task<IActionResult> GetMessageById(int MessageId)
+        {
+            return Ok(await new ChatTasks().GetMessageById(MessageId));
+        }
     }
 }

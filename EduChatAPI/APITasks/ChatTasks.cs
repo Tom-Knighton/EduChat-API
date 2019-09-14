@@ -68,6 +68,57 @@ namespace EduChatAPI.APITasks
             }
         }
 
+        public async Task<List<ChatMessage>> GetMessagesForChat(int chatid)
+        {
+            using(var conn = new MySqlConnection(connString))
+            {
+                await conn.OpenAsync();
+                List<ChatMessage> messages = new List<ChatMessage>();
+                using (var cmd = new MySqlCommand($"SELECT * FROM chat_message WHERE chatId={chatid} AND isDeleted={false};", conn))
+                using (var reader = await cmd.ExecuteReaderAsync())
+                    while (await reader.ReadAsync())
+                    {
+                        messages.Add(new ChatMessage
+                        {
+                            chatId = Convert.ToInt32(reader["chatId"]),
+                            messageId = Convert.ToInt32(reader["messageId"]),
+                            messageType = Convert.ToInt32(reader["messageType"]),
+                            userId = Convert.ToInt32(reader["userId"]),
+                            dateCreated = Convert.ToDateTime(reader["dateCreated"]),
+                            hasBeenEdited = Convert.ToBoolean(reader["hasBeenEdited"]),
+                            isDeleted = Convert.ToBoolean(reader["isDeleted"]),
+                            user = await new UserTasks().GetUserById(Convert.ToInt32(reader["userId"]), flatten: true),
+                            messageText = reader["messageText"].ToString()
+                        });
+                    }
+                return messages;
+            }
+        }
+
+        public async Task<ChatMessage> GetMessageById(int ChatId)
+        {
+            using (var conn = new MySqlConnection(connString))
+            {
+                await conn.OpenAsync();
+                using (var cmd = new MySqlCommand($"SELECT * FROM chat_message WHERE chatId={ChatId};", conn))
+                using (var reader = await cmd.ExecuteReaderAsync())
+                    if (await reader.ReadAsync())
+                        return new ChatMessage
+                        {
+                            chatId = Convert.ToInt32(reader["chatId"]),
+                            messageId = Convert.ToInt32(reader["messageId"]),
+                            messageType = Convert.ToInt32(reader["messageType"]),
+                            userId = Convert.ToInt32(reader["userId"]),
+                            dateCreated = Convert.ToDateTime(reader["dateCreated"]),
+                            hasBeenEdited = Convert.ToBoolean(reader["hasBeenEdited"]),
+                            isDeleted = Convert.ToBoolean(reader["isDeleted"]),
+                            user = await new UserTasks().GetUserById(Convert.ToInt32(reader["userId"]), flatten: true),
+                            messageText = reader["messageText"].ToString()
+                        };
+                return null;
+            }
+        }
+
         public async Task<Chat> AddToChat(int userid, int chatid)
         {
             using (var conn = new MySqlConnection(connString))

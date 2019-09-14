@@ -11,5 +11,7 @@ namespace EduChatAPI.Objects
         public bool hasBeenEdited { get; set; }
         public DateTime dateCreated { get; set; }
         public bool isDeleted { get; set; }
+
+        public User user { get; set; }
     }
 }
