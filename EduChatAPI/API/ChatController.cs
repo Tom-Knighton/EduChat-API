@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EduChatAPI.APITasks;
+using EduChatAPI.Objects;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -33,5 +34,11 @@ namespace EduChatAPI.API
         {
             return Ok(await new ChatTasks().GetMessageById(MessageId));
         }
+
+        [HttpPost("AddNewMessageToChat/{ChatId}")]
+        public async Task<IActionResult> AddNewMessageToChat(int ChatId, [FromBody] ChatMessage msg)
+        {
+            return Ok(await new ChatTasks().AddMessageToChat(msg, ChatId));
+        } 
     }
 }

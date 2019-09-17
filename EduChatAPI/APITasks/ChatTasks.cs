@@ -100,7 +100,7 @@ namespace EduChatAPI.APITasks
             using (var conn = new MySqlConnection(connString))
             {
                 await conn.OpenAsync();
-                using (var cmd = new MySqlCommand($"SELECT * FROM chat_message WHERE chatId={ChatId};", conn))
+                using (var cmd = new MySqlCommand($"SELECT * FROM chat_message WHERE messageId={ChatId};", conn))
                 using (var reader = await cmd.ExecuteReaderAsync())
                     if (await reader.ReadAsync())
                         return new ChatMessage
@@ -127,11 +127,28 @@ namespace EduChatAPI.APITasks
                 using (var cmd = new MySqlCommand())
                 {
                     cmd.Connection = conn;
-                    cmd.CommandText = "INSERT INTO chat_member VALUES ({chatid}, {userid}, {true}) ON DUPLICATE KEY UPDATE chatId=VALUES(chatId), userId=VALUES(userId), isInChat=VALUES(isInChat);";
+                    cmd.CommandText = $"INSERT INTO chat_member VALUES ({chatid}, {userid}, {true}) ON DUPLICATE KEY UPDATE chatId=VALUES(chatId), userId=VALUES(userId), isInChat=VALUES(isInChat);";
                     await cmd.ExecuteNonQueryAsync();
                     return await GetChatById(chatid);
                 }
 
+            }
+        }
+
+        public async Task<ChatMessage> AddMessageToChat(ChatMessage msg, int chatId)
+        {
+            using (var conn = new MySqlConnection(connString)) //Creates connection that will be destroyed when scope ends
+            {
+                await conn.OpenAsync(); //Waits for connection to open
+                using (var cmd = new MySqlCommand()) //New command
+                {
+                    cmd.Connection = conn; //Sets connection
+                    cmd.CommandText = $"INSERT INTO chat_message VALUES ({0}, {chatId}, {msg.userId}, {msg.messageType}, '{msg.messageText}', {false}, '{msg.dateCreated.ToString("yyyy-MM-dd hh:mm:ss")}', {false});";
+                    // ^ Inserts new message into chat_message table
+                    await cmd.ExecuteNonQueryAsync(); //waits for command to execute
+                    int lId = (int)cmd.LastInsertedId; //Grabs the auto incremented Id of that message
+                    msg.messageId = lId; return msg; //Returns the message with that id
+                }
             }
         }
     }
