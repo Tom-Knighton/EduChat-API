@@ -22,7 +22,8 @@ namespace EduChatAPI.Hubs
             await Groups.AddToGroupAsync(Context.ConnectionId, groupId);
             await Clients.Group(groupId).SendAsync("conn", "hi");
             await Clients.Client(Context.ConnectionId).SendAsync("conn", "hi2");
-        }
+            await Clients.All.SendAsync("conn", "hi from global")
+;        }
         public async Task RemoveFromGroup(string groupId)
         {
             //Removes client from group subscription
