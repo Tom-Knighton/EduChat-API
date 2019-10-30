@@ -48,7 +48,7 @@
         document.getElementById("messagesList").appendChild(li);
     });
     connection.on("BROADCAST", (msg) => {
-        console.log('bc');
+        console.log('bc'+msg);
     });
 
     connection.start().catch(err => console.error(err.toString()));
@@ -56,7 +56,7 @@
     document.getElementById("sendButton").addEventListener("click", event => {
         const user = document.getElementById("userInput").value;
         const message = document.getElementById("messageInput").value;
-        connection.invoke("SendChatMessage", 1, message, 1).catch(err => console.error(err.toString()));
+        connection.invoke("CreateChatMessage", message).catch(err => console.error(err.toString()));
         event.preventDefault();
     });
     </script>
