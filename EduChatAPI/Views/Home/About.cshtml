@@ -41,10 +41,13 @@
         .configureLogging(signalR.LogLevel.Trace)
         .build();
 
-    connection.on("RecieveTestMessage", (user, message) => {
+    connection.on("MessageRecieved", (user, message, rand) => {
         const li = document.createElement("li");
-        li.textContent = user + " says " + message;
+        li.textContent = "MgRecieved "+user
         document.getElementById("messagesList").appendChild(li);
+    });
+    connection.on("BROADCAST", (msg) => {
+        console.log('bc');
     });
 
     connection.start().catch(err => console.error(err.toString()));
@@ -52,7 +55,7 @@
     document.getElementById("sendButton").addEventListener("click", event => {
         const user = document.getElementById("userInput").value;
         const message = document.getElementById("messageInput").value;
-        connection.invoke("SendTestMessage", user, message).catch(err => console.error(err.toString()));
+        connection.invoke("SendMessage", 1, message, 1).catch(err => console.error(err.toString()));
         event.preventDefault();
     });
     </script>
