@@ -42,8 +42,9 @@
         .build();
 
     connection.on("ChatMessageRecieved", (user, message, rand) => {
+        console.log(message);
         const li = document.createElement("li");
-        li.textContent = "MgRecieved "+user
+        li.textContent = "MgRecieved "+user;
         document.getElementById("messagesList").appendChild(li);
     });
     connection.on("BROADCAST", (msg) => {
