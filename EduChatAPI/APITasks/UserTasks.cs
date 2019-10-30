@@ -42,7 +42,6 @@ namespace EduChatAPI.APITasks
             }
         }
 
-
         public async Task<User> GetUserById(int UserId, bool flatten = false)
         {
             using (var conn = new MySqlConnection(connString))
