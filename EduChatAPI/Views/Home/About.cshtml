@@ -41,7 +41,7 @@
         .configureLogging(signalR.LogLevel.Trace)
         .build();
 
-    connection.on("MessageRecieved", (user, message, rand) => {
+    connection.on("ChatMessageRecieved", (user, message, rand) => {
         const li = document.createElement("li");
         li.textContent = "MgRecieved "+user
         document.getElementById("messagesList").appendChild(li);
@@ -55,7 +55,7 @@
     document.getElementById("sendButton").addEventListener("click", event => {
         const user = document.getElementById("userInput").value;
         const message = document.getElementById("messageInput").value;
-        connection.invoke("SendMessage", 1, message, 1).catch(err => console.error(err.toString()));
+        connection.invoke("SendChatMessage", 1, message, 1).catch(err => console.error(err.toString()));
         event.preventDefault();
     });
     </script>

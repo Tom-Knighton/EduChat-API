@@ -7,11 +7,11 @@ namespace EduChatAPI.Hubs
     public class ChatHub : Hub
     {
 
-        public async Task SendMessage(int senderid, string groupToSendTo, int messageId)
+        public async Task SendChatMessage(int senderid, string groupToSendTo, int messageId)
         {
             await Clients.All.SendAsync("BROADCAST", "RECIEVED");
             // Client calls SendMessage with senderid, the id of the group to send to and the id of the message
-            await Clients.Group(groupToSendTo).SendAsync("MessageRecieved", groupToSendTo, senderid, messageId);
+            await Clients.Group(groupToSendTo).SendAsync("ChatMessageRecieved", groupToSendTo, senderid, messageId);
             //All clients in that group listen for the MessageRecieved event with the senderid and the messageid
         }
 
