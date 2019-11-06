@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using EduChatAPI.Objects;
+using Microsoft.AspNetCore.Http;
 using MySql.Data.MySqlClient;
 
 namespace EduChatAPI.APITasks
@@ -150,6 +152,18 @@ namespace EduChatAPI.APITasks
                     msg.messageId = lId; return msg; //Returns the message with that id
                 }
             }
+        }
+
+        public async Task<String> UploadChatAttachment(IFormFile file, int ChatId)
+        {
+            Directory.CreateDirectory($"/var/www/cdn/ChatAttachments/{ChatId}/"); //Creates the directory if it does not exist
+            var filepath = $"/var/www/cdn/ChatAttachments/{ChatId}/{file.FileName}";
+            using (var stream = new FileStream(filepath, FileMode.Create)) //the using keyword means this FileStream will be destroyed once it has completed
+            {
+                await file.CopyToAsync(stream); //Creates the file at the filePath;
+            }
+            return $"https://cdn.tomk.online/ChatAttachments/{ChatId}/{file.FileName}";
+           
         }
     }
 }
