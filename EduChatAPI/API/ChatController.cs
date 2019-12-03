@@ -41,6 +41,7 @@ namespace EduChatAPI.API
         {
             return Ok(await new ChatTasks().AddMessageToChat(msg, ChatId));
         }
+
         [HttpPost("UploadChatAttachment/{ChatId}")]
         public async Task<IActionResult> UploadChatAttachment(int ChatId)
         {
@@ -49,6 +50,12 @@ namespace EduChatAPI.API
                 return Ok(await new ChatTasks().UploadChatAttachment(HttpContext.Request.Form.Files.First(), ChatId)); //Returns success (200) with the new url
             }
             return BadRequest(); //Else, returns code 400, bad request
+        }
+
+        [HttpPut("RemoveChatMessage/{ChatId}/{MessageId}")]
+        public async Task<IActionResult> RemoveChatMessage(int ChatId, int MessageId)
+        { 
+            return Ok(await new ChatTasks().RemoveMessage(MessageId, ChatId)); //Returns success (200) with a boolean indicating success
         }
     }
 }

@@ -14,7 +14,12 @@ namespace EduChatAPI.Hubs
             //All clients in that group listen for the MessageRecieved event with the senderid and the messageid
         }
 
-       
+        public async Task DeleteMessage(string groupToSendTo, int messageId)
+        {
+            // Client calls DeleteMessage with the id of the group and the id of the message
+            await Clients.Group(groupToSendTo).SendAsync("RemoveMessage", groupToSendTo, messageId);
+            //ALl clients in that group listen for the RemoveMessage event with the group and the messageid
+        }
         
 
         public async Task SubscribeToGroup(string groupId)

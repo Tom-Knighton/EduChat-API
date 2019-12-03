@@ -154,16 +154,30 @@ namespace EduChatAPI.APITasks
             }
         }
 
-        public async Task<String> UploadChatAttachment(IFormFile file, int ChatId)
+        public async Task<bool> RemoveMessage(int messageId, int chatId)
         {
-            Directory.CreateDirectory($"/var/www/cdn/ChatAttachments/{ChatId}/"); //Creates the directory if it does not exist
-            var filepath = $"/var/www/cdn/ChatAttachments/{ChatId}/{file.FileName}";
+            using (var conn = new MySqlConnection(connString)) // Creates connection that will be destroyed when scope ends
+            {
+                await conn.OpenAsync(); //Waits for connection to open
+                using (var cmd = new MySqlCommand()) //New command
+                {
+                    cmd.Connection = conn; //Sets connection
+                    cmd.CommandText = $"UPDATE chat_message SET `isDeleted`='0' WHERE `messageId`={messageId}";
+                    // ^ sets is deleted to true where the message is
+                    await cmd.ExecuteNonQueryAsync(); //executes command
+                    return true; //returns true
+                }
+            }
+        }
+        public async Task<String> UploadChatAttachment(IFormFile file, int chatId)
+        {
+            Directory.CreateDirectory($"/var/www/cdn/ChatAttachments/{chatId}/"); //Creates the directory if it does not exist
+            var filepath = $"/var/www/cdn/ChatAttachments/{chatId}/{file.FileName}";
             using (var stream = new FileStream(filepath, FileMode.Create)) //the using keyword means this FileStream will be destroyed once it has completed
             {
                 await file.CopyToAsync(stream); //Creates the file at the filePath;
             }
-            return $"https://cdn.tomk.online/ChatAttachments/{ChatId}/{file.FileName}";
-           
+            return $"https://cdn.tomk.online/ChatAttachments/{chatId}/{file.FileName}";
         }
     }
 }
