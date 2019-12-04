@@ -148,7 +148,7 @@ namespace EduChatAPI.APITasks
                     cmd.CommandText = $"INSERT INTO chat_message VALUES ({0}, {chatId}, {msg.userId}, {msg.messageType}, '{msg.messageText}', {false}, '{msg.dateCreated.ToString("yyyy-MM-dd hh:mm:ss")}', {false});";
                     // ^ Inserts new message into chat_message table
                     await cmd.ExecuteNonQueryAsync(); //waits for command to execute
-                    int lId = (int)cmd.LastInsertedId; //Grabs the auto incremented Id of that message
+                    int lId = (int)cmd.LastInsertedId; //Grabs the auto incremented Id of that message 
                     msg.messageId = lId; return msg; //Returns the message with that id
                 }
             }
@@ -162,7 +162,7 @@ namespace EduChatAPI.APITasks
                 using (var cmd = new MySqlCommand()) //New command
                 {
                     cmd.Connection = conn; //Sets connection
-                    cmd.CommandText = $"UPDATE chat_message SET `isDeleted`='0' WHERE `messageId`={messageId}";
+                    cmd.CommandText = $"UPDATE chat_message SET `isDeleted`='1' WHERE `messageId`={messageId}";
                     // ^ sets is deleted to true where the message is
                     await cmd.ExecuteNonQueryAsync(); //executes command
                     return true; //returns true
