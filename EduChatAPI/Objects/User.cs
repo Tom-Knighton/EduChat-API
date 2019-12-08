@@ -22,6 +22,7 @@ namespace EduChatAPI.Objects
 
         public List<Subject> Subjects { get; set; }
         public List<Chat> Chats { get; set; }
+        public List<Friendship> Friendships { get; set; }
         
     }   
 }

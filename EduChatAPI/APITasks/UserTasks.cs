@@ -58,7 +58,8 @@ namespace EduChatAPI.APITasks
                             UserProfilePictureURL = reader["UserProfilePictureURL"].ToString(), UserSchool = reader["UserSchool"].ToString(), IsModerator = Convert.ToBoolean(reader["IsModerator"]),
                             IsAdmin = Convert.ToBoolean(reader["IsAdmin"]), IsDeleted = Convert.ToBoolean(reader["IsDeleted"]), UserPassHash = reader["UserPassHash"].ToString(),
                             Subjects = !flatten ? await new SubjectTasks().GetSubscribedSubjects(UserId) : null,
-                            Chats = !flatten ? await new ChatTasks().GetAllChatsForUser(UserId) : null
+                            Chats = !flatten ? await new ChatTasks().GetAllChatsForUser(UserId) : null,
+                            Friendships = !flatten ? await new FriendshipTasks().GetAllFriendsForUser(UserId) : null
                         };
                     }
                     else return null;
