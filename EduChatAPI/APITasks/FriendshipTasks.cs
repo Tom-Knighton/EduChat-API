@@ -76,8 +76,8 @@ namespace EduChatAPI.APITasks
             {
                 await conn.OpenAsync(); //waits for conn to open               
                 using (var cmd = new MySqlCommand($"INSERT INTO user_friendships VALUES({friendship.FirstUserId}, {friendship.SecondUserId}, {friendship.IsBlocked}," +
-                    $" {friendship.IsBestFriend}" +
-                    $" ON DUPLICATE KEY UPDATE IsBlocked=VALUES(IsBlocked), IsBestFriend=VALUES(IsBestFriend);", conn)) //Inserts a new row into the table setting the friendship IsBlocked to true. If a friendship already exists
+                    $" {friendship.IsBestFriend})" +
+                    $" ON DUPLICATE KEY UPDATE IsBlocked = VALUES(IsBlocked), IsBestFriend = VALUES(IsBestFriend);", conn)) //Inserts a new row into the table setting the friendship IsBlocked to true. If a friendship already exists
                                                                                      // then then a new row is not inserted and the IsBlocked value is just updated
                     await cmd.ExecuteNonQueryAsync(); //Executes the command 
                 return friendship; //Returns the new friendship object
