@@ -79,7 +79,8 @@ namespace EduChatAPI.APITasks
                     $" {friendship.IsBestFriend})" +
                     $" ON DUPLICATE KEY UPDATE IsBlocked = VALUES(IsBlocked), IsBestFriend = VALUES(IsBestFriend);", conn)) //Inserts a new row into the table setting the friendship IsBlocked to true. If a friendship already exists
                                                                                      // then then a new row is not inserted and the IsBlocked value is just updated
-                    await cmd.ExecuteNonQueryAsync(); //Executes the command 
+                    await cmd.ExecuteNonQueryAsync(); //Executes the command
+                friendship.User2 = await new UserTasks().GetUserById(friendship.SecondUserId);
                 return friendship; //Returns the new friendship object
             }
         }
