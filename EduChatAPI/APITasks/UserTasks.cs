@@ -66,6 +66,30 @@ namespace EduChatAPI.APITasks
             }
         }
 
+        public async Task<User> GetUserByUsername(string username, bool flatten = false)
+        {
+            using (var conn = new MySqlConnection(connString))
+            {
+                await conn.OpenAsync();
+                using (var cmd = new MySqlCommand($"SELECT * FROM user WHERE `UserName`='{username}' AND IsDeleted = 0;", conn))
+                using (var reader = await cmd.ExecuteReaderAsync())
+                    if (await reader.ReadAsync())
+                    {
+                        return new User
+                        {
+                            UserId = Convert.ToInt32(reader["UserId"]), UserEmail = reader["UserEmail"].ToString(),  UserName = reader["UserName"].ToString(),
+                            UserFullName = reader["UserFullName"].ToString(), UserGender = reader["UserGender"].ToString(), UserDOB = Convert.ToDateTime(reader["UserDOB"]),
+                            UserProfilePictureURL = reader["UserProfilePictureURL"].ToString(), UserSchool = reader["UserSchool"].ToString(), IsModerator = Convert.ToBoolean(reader["IsModerator"]),
+                            IsAdmin = Convert.ToBoolean(reader["IsAdmin"]), IsDeleted = Convert.ToBoolean(reader["IsDeleted"]), UserPassHash = reader["UserPassHash"].ToString(),
+                            Subjects = !flatten ? await new SubjectTasks().GetSubscribedSubjects(Convert.ToInt32(reader["UserId"])) : null,
+                            Chats = !flatten ? await new ChatTasks().GetAllChatsForUser(Convert.ToInt32(reader["UserId"])) : null,
+                            Friendships = !flatten ? await new FriendshipTasks().GetAllFriendsForUser(Convert.ToInt32(reader["UserId"])) : null
+                        };
+                    }
+                    return null;
+            }
+        }
+
         public async Task<User> AuthenticateUser(AuthenticatingUser usr)
         {
             using (var conn = new MySqlConnection(connString))

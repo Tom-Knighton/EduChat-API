@@ -32,8 +32,8 @@ namespace EduChatAPI.API
         }
 
         [HttpPut("SetBlock/{userid1}/{userid2}")]
-        public async Task<IActionResult> SetBlock(int userid1, int userid2, bool block = true)
-        {
+        public async Task<IActionResult> SetBlock(int userid1, int userid2, bool block)
+        { 
             return Ok(await new FriendshipTasks().SetBlock(userid1, userid2, block));
         }
 
