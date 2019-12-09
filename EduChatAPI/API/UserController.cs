@@ -34,7 +34,7 @@ namespace EduChatAPI.API
         [HttpGet("GetUserByUsername/{username}")]
         public async Task<IActionResult> GetUserByUsername(string username, bool flatten = true)
         {
-            User user = await new UserTasks().GetUserByUsername(username); //Creates a new instance of the UserTasks class and gets the user object from the ID
+            User user = await new UserTasks().GetUserByUsername(username, flatten); //Creates a new instance of the UserTasks class and gets the user object from the ID
             if (user == null) return NotFound(); //Returns not found if the request is invalid (status code 404)
             return Ok(user); //Else, returns Ok (200) with the user object as json
         }
