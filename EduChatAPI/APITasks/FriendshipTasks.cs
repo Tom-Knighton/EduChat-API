@@ -91,7 +91,7 @@ namespace EduChatAPI.APITasks
             {
                 await conn.OpenAsync();
                 List<Friendship> friendships = new List<Friendship>();
-                using (var cmd = new MySqlCommand($"SELECT * FROM user_friendships WHERE FirstUserId='{userid}';", conn))
+                using (var cmd = new MySqlCommand($"SELECT * FROM user_friendships WHERE FirstUserId='{userid}' AND IsDeleted={false};", conn))
                 using (var reader = await cmd.ExecuteReaderAsync())
                     while (await reader.ReadAsync())
                     {
@@ -111,8 +111,7 @@ namespace EduChatAPI.APITasks
             using (var conn = new MySqlConnection(connString)) //Creates connection that deletes itself once scope is over
             {
                 await conn.OpenAsync(); //waits for conn to open               
-                using (var cmd = new MySqlCommand($"UPDATE user_friendships SET FirstUserId={0}, SecondUserId={0}, IsBlocked={false}, IsBestFriend={false} WHERE " +
-                    $"FirstUserId={userid1} AND SecondUserId={userid2};", conn)) //Blanks out row
+                using (var cmd = new MySqlCommand($"DELETE FROM user_friendships WHERE FirstUserId={userid1} AND SecondUserID={userid2};", conn)) //Blanks out row
                     await cmd.ExecuteNonQueryAsync(); //Executes the command
                 return userid2; //Returns the user id
             }

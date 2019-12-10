@@ -7,6 +7,7 @@ namespace EduChatAPI.Objects
         public int SecondUserId { get; set; }
         public bool IsBlocked { get; set; }
         public bool IsBestFriend { get; set; }
+        public bool IsDeleted { get; set; }
 
         //internal
         public User User1 { get; set; }
