@@ -42,5 +42,11 @@ namespace EduChatAPI.API
         {
             return Ok(await new FriendshipTasks().GetAllFriendsForUser(userId));
         }
+
+        [HttpGet("RemoveFriendship/{userid1}/{userid2}")]
+        public async Task<IActionResult> RemoveFriendship(int userid1, int userid2)
+        {
+            return Ok(await new FriendshipTasks().RemoveFriendship(userid1, userid2));
+        }
     }
 }
