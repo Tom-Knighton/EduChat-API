@@ -91,7 +91,7 @@ namespace EduChatAPI.APITasks
             {
                 await conn.OpenAsync();
                 List<Friendship> friendships = new List<Friendship>();
-                using (var cmd = new MySqlCommand($"SELECT * FROM user_friendships WHERE FirstUserId='{userid}' AND IsDeleted={false};", conn))
+                using (var cmd = new MySqlCommand($"SELECT * FROM user_friendships WHERE FirstUserId='{userid}';", conn))
                 using (var reader = await cmd.ExecuteReaderAsync())
                     while (await reader.ReadAsync())
                     {
