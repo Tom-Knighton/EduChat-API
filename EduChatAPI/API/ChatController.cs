@@ -14,7 +14,11 @@ namespace EduChatAPI.API
     [Route("api/[controller]")]
     public class ChatController : Controller
     {
-
+        [HttpPost("CreateNewChat")]
+        public async Task<IActionResult> CreateNewChat([FromBody] Chat chat)
+        {
+            return Ok(await new ChatTasks().CreateNewChat(chat));
+        }
         [HttpGet("GetChatById/{ChatId}")]
         public async Task<IActionResult> GetChatById(int ChatId)
         {

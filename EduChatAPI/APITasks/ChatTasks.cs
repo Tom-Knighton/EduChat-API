@@ -12,6 +12,25 @@ namespace EduChatAPI.APITasks
     public class ChatTasks
     {
         string connString= "server=127.0.0.1;port=3306;database=educhat;user=db;password=Tom7494";
+
+
+        public async Task<Chat> CreateNewChat(Chat chat)
+        {
+            using (var conn = new MySqlConnection(connString))
+            {
+                await conn.OpenAsync();
+                using (var cmd = new MySqlCommand())
+                {
+                    cmd.Connection = conn;
+                    cmd.CommandText = $"INSERT INTO chat VALUES({0}, {chat.ChatName}, {chat.isProtected}, {chat.isPublic}, {chat.isDeleted});";
+                    chat.ChatId = (int)cmd.LastInsertedId;
+                    foreach (ChatMember m in chat.members) { if (m.isInChat) await AddToChat(m.UserId, chat.ChatId); }
+                    await cmd.ExecuteNonQueryAsync();
+                    return await GetChatById(chat.ChatId);
+                }
+
+            }
+        }
         public async Task<Chat> GetChatById(int chatid)
         {
             using (var conn = new MySqlConnection(connString))
