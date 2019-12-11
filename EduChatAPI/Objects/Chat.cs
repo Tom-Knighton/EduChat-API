@@ -12,6 +12,7 @@ namespace EduChatAPI.Objects
         public bool isDeleted { get; set; }
 
         public List<ChatMember> members { get; set; }
+        public List<int> memberIds { get; set; }
         public List<ChatMessage> messages { get; set; }
     }
 }

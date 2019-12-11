@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using EduChatAPI.Objects;
 using Microsoft.AspNetCore.Http;
@@ -20,15 +21,20 @@ namespace EduChatAPI.APITasks
                 using(var reader = await cmd.ExecuteReaderAsync())
                     if (await reader.ReadAsync())
                     {
-                        return new Chat
+                        Chat chat = new Chat
                         {
                             ChatId = Convert.ToInt32(reader["chatId"]),
                             ChatName = reader["chatName"].ToString(),
                             isProtected = Convert.ToBoolean(reader["isProtected"]),
                             isPublic = Convert.ToBoolean(reader["isPublic"]),
                             isDeleted = Convert.ToBoolean(reader["isDeleted"]),
-                            members = await GetMembersForChat(chatid)
+                            members = await GetMembersForChat(chatid),
+                            
                         };
+                        List<int> memberids = new List<int>();
+                        foreach (ChatMember m in chat.members) { if (m.isInChat) { memberids.Add(m.UserId); } }
+                        chat.memberIds = memberids.OrderBy(i => i).ToList();
+                        return chat;
                     }
                 return null;
             }
