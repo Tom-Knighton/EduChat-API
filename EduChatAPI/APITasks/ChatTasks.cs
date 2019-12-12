@@ -25,7 +25,7 @@ namespace EduChatAPI.APITasks
                     cmd.CommandText = $"INSERT INTO chat VALUES({0}, '{chat.ChatName}', {chat.isProtected}, {chat.isPublic}, {chat.isDeleted});";
                     await cmd.ExecuteNonQueryAsync();
                     chat.ChatId = (int)cmd.LastInsertedId;
-                    foreach (ChatMember m in chat.members) { if (m.isInChat) await AddToChat(m.UserId, chat.ChatId); }
+                    foreach (int m in chat.memberIds) { await AddToChat(m, chat.ChatId); }
                     return await GetChatById(chat.ChatId);
                 }
 
