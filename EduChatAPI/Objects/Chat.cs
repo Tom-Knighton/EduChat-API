@@ -10,6 +10,8 @@ namespace EduChatAPI.Objects
         public bool isProtected { get; set; }
         public bool isPublic { get; set; }
         public bool isDeleted { get; set; }
+        public DateTime DateCreated { get; set; }
+        public ChatMessage LastMessage { get; set; }
 
         public List<ChatMember> members { get; set; }
         public List<int> memberIds { get; set; }

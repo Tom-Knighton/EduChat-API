@@ -22,7 +22,7 @@ namespace EduChatAPI.APITasks
                 using (var cmd = new MySqlCommand())
                 {
                     cmd.Connection = conn;
-                    cmd.CommandText = $"INSERT INTO chat VALUES({0}, '{chat.ChatName}', {chat.isProtected}, {chat.isPublic}, {chat.isDeleted});";
+                    cmd.CommandText = $"INSERT INTO chat VALUES({0}, '{chat.ChatName}', {chat.isProtected}, {chat.isPublic}, {chat.isDeleted}, {chat.DateCreated.ToString("yyyy-MM-dd hh:mm:ss")});";
                     await cmd.ExecuteNonQueryAsync();
                     chat.ChatId = (int)cmd.LastInsertedId;
                     foreach (int m in chat.memberIds) { await AddToChat(m, chat.ChatId); }
@@ -47,7 +47,9 @@ namespace EduChatAPI.APITasks
                             isProtected = Convert.ToBoolean(reader["isProtected"]),
                             isPublic = Convert.ToBoolean(reader["isPublic"]),
                             isDeleted = Convert.ToBoolean(reader["isDeleted"]),
+                            DateCreated = Convert.ToDateTime(reader["dateCreated"]),
                             members = await GetMembersForChat(chatid),
+                            LastMessage = await GetLastChatMessageForChat(chatid)
                             
                         };
                         List<int> memberids = new List<int>();
@@ -69,6 +71,7 @@ namespace EduChatAPI.APITasks
                 using (var reader = await cmd.ExecuteReaderAsync())
                     while (await reader.ReadAsync()) 
                         chats.Add(await GetChatById(Convert.ToInt32(reader["chatId"])));
+                chats.OrderBy(c => c.messages.Count > 0 ? c.messages.Last().dateCreated : c.DateCreated);
                 return chats;
             }           
         }
@@ -95,7 +98,20 @@ namespace EduChatAPI.APITasks
             }
         }
 
-        public async Task<List<ChatMessage>> GetMessagesForChat(int chatid)
+
+        public async Task<ChatMessage> GetLastChatMessageForChat(int chatid)
+        {
+            using (var conn = new MySqlConnection(connString))
+            {
+                await conn.OpenAsync();
+                using (var cmd = new MySqlCommand($"SELECT * FROM chat_message WHERE chatId={chatid} AND isDeleted={false} ORDER BY dateCreated DESC LIMIT 1;", conn))
+                using (var reader = await cmd.ExecuteReaderAsync())
+                    if (await reader.ReadAsync())
+                        return await GetMessageById(Convert.ToInt32(reader["messageId"]), flatten: true);
+                return null;
+            }
+        }
+        public async Task<List<ChatMessage>> GetMessagesForChat(int chatid, bool flatten = false)
         {
             using(var conn = new MySqlConnection(connString))
             {
@@ -114,7 +130,7 @@ namespace EduChatAPI.APITasks
                             dateCreated = Convert.ToDateTime(reader["dateCreated"]),
                             hasBeenEdited = Convert.ToBoolean(reader["hasBeenEdited"]),
                             isDeleted = Convert.ToBoolean(reader["isDeleted"]),
-                            user = await new UserTasks().GetUserById(Convert.ToInt32(reader["userId"]), flatten: true),
+                            user = !flatten ? await new UserTasks().GetUserById(Convert.ToInt32(reader["userId"]), flatten: true) : null,
                             messageText = reader["messageText"].ToString()
                         });
                     }
@@ -122,7 +138,7 @@ namespace EduChatAPI.APITasks
             }
         }
 
-        public async Task<ChatMessage> GetMessageById(int ChatId)
+        public async Task<ChatMessage> GetMessageById(int ChatId, bool flatten = true)
         {
             using (var conn = new MySqlConnection(connString))
             {
@@ -139,7 +155,7 @@ namespace EduChatAPI.APITasks
                             dateCreated = Convert.ToDateTime(reader["dateCreated"]),
                             hasBeenEdited = Convert.ToBoolean(reader["hasBeenEdited"]),
                             isDeleted = Convert.ToBoolean(reader["isDeleted"]),
-                            user = await new UserTasks().GetUserById(Convert.ToInt32(reader["userId"]), flatten: true),
+                            user = !flatten ? await new UserTasks().GetUserById(Convert.ToInt32(reader["userId"]), flatten: true) : null,
                             messageText = reader["messageText"].ToString()
                         };
                 return null;
