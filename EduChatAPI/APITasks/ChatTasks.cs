@@ -138,7 +138,7 @@ namespace EduChatAPI.APITasks
             }
         }
 
-        public async Task<ChatMessage> GetMessageById(int ChatId, bool flatten = true)
+        public async Task<ChatMessage> GetMessageById(int ChatId, bool flatten = false)
         {
             using (var conn = new MySqlConnection(connString))
             {
