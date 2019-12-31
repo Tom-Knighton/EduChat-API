@@ -19,5 +19,8 @@
 
   <ItemGroup>
     <Folder Include="Hubs\" />
+    <Folder Include="Objects\User\" />
+    <Folder Include="Objects\Chat\" />
+    <Folder Include="Objects\Feed\" />
   </ItemGroup>
 </Project>
