@@ -17,5 +17,10 @@ namespace EduChatAPI.API
         {
             return Ok(await new FeedTasks().GetPostById(id));
         }
+        [HttpGet("GetAllPostsForSubject/{subjectId}")]
+        public async Task<IActionResult> GetAllPostsForSubject(int subjectid)
+        {
+            return Ok(await new FeedTasks().GetAllPostsForSubject(subjectid));
+        }
     }
 }

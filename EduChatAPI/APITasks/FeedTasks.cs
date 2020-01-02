@@ -52,6 +52,24 @@ namespace EduChatAPI.APITasks
             }
         }
 
+        public async Task<List<FeedPost>> GetAllPostsForSubject(int subjid)
+        {
+            List<FeedPost> posts = new List<FeedPost>();
+            using (var conn = new MySqlConnection(connString))
+            {
+                await conn.OpenAsync();
+                using (var cmd = new MySqlCommand($"SELECT * FROM feed_post WHERE `SubjectId`={subjid} AND IsDeleted={false};", conn))
+                using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        posts.Add(await GetPostById(Convert.ToInt32(reader["postId"])));
+                    }
+                }
+            }
+            return posts;
+        }
+
         public async Task<FeedTextPost> AddTextPostValues(FeedTextPost post)
         {
             using (var conn = new MySqlConnection(connString)) //New connection
