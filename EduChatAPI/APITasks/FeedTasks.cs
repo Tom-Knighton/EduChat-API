@@ -67,7 +67,8 @@ namespace EduChatAPI.APITasks
                     }
                 }
             }
-            return posts.OrderBy(p => p.datePosted).ToList();
+            posts.Sort((x, y) => y.datePosted.CompareTo(x.datePosted));
+            return posts;
         }
 
         public async Task<FeedTextPost> AddTextPostValues(FeedTextPost post)
