@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Common;
 
 namespace EduChatAPI.Objects.Feed
@@ -13,6 +14,7 @@ namespace EduChatAPI.Objects.Feed
         public bool isAnnouncement { get; set; }
         public bool isDeleted { get; set; }
 
+        public List<FeedLike> likes { get; set; }
         public User poster { get; set; }
         public Subject subject { get; set; }
     }

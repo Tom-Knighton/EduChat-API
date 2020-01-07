@@ -31,7 +31,8 @@ namespace EduChatAPI.APITasks
                             postId = Convert.ToInt32(reader["postId"]), posterId = Convert.ToInt32(reader["posterId"]),
                             postType = reader["postType"].ToString(), subjectId = Convert.ToInt32(reader["subjectId"]),
                             datePosted = Convert.ToDateTime(reader["datePosted"]), isAnnouncement = Convert.ToBoolean(reader["isAnnouncement"]),
-                            isDeleted = Convert.ToBoolean(reader["isDeleted"]), poster = await new UserTasks().GetUserById(Convert.ToInt32(reader["posterId"]), flatten: true)
+                            isDeleted = Convert.ToBoolean(reader["isDeleted"]), poster = await new UserTasks().GetUserById(Convert.ToInt32(reader["posterId"]), flatten: true),
+                            likes = await GetAllLikesForPost(Convert.ToInt32(reader["postId"]))
                         };
                         string json = Json.Stringify(post); //Convert the above object into a json string
                         switch (post.postType) //What to do for each post type
@@ -108,6 +109,28 @@ namespace EduChatAPI.APITasks
                     } 
                 }
                 return null; //Else, return nothing.
+            }
+        }
+
+        public async Task<List<FeedLike>> GetAllLikesForPost(int PostId)
+        {
+            using (var conn = new MySqlConnection(connString)) //Creates temp connection
+            {
+                List<FeedLike> likes = new List<FeedLike>(); //List of FeedLike objects
+                await conn.OpenAsync(); //Opens connection
+                using (var cmd = new MySqlCommand($"SELECT * FROM feed_post_likes WHERE `PostId`={PostId} AND `IsLiked`={true};", conn))
+                    // ^ Gets all the rows for the post where IsLiked is true
+                using (var reader = await cmd.ExecuteReaderAsync()) //Executes the command
+                    while (await reader.ReadAsync()) //While we read each row
+                    {
+                        likes.Add(new FeedLike //Adds the new like object
+                        {
+                            PostId = Convert.ToInt32(reader["postId"]),
+                            UserId = Convert.ToInt32(reader["userId"]),
+                            IsLiked = Convert.ToBoolean(reader["isLiked"])
+                        });
+                    }
+                return likes; //returns the list of likes
             }
         }
     }
