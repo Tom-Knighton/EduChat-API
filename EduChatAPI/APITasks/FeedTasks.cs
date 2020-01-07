@@ -133,5 +133,16 @@ namespace EduChatAPI.APITasks
                 return likes; //returns the list of likes
             }
         }
+
+        public async Task<FeedPost> SetLikeStatus(int PostId, int UserId, bool setLiked)
+        {
+            using (var conn = new MySqlConnection(connString)) //Creates new temporary connection
+            {
+                await conn.OpenAsync(); //Opens the connection
+                using (var cmd = new MySqlCommand($"INSERT INTO feed_post_likes VALUES({PostId}, {UserId}, {setLiked}) ON DUPLICATE KEY UPDATE IsLiked={setLiked};", conn))
+                    await cmd.ExecuteNonQueryAsync(); //Inserts new like into the database, if a row for that user and post already exist, update the row
+                return await GetPostById(PostId); //Return the new post object
+            }
+        }
     }
 }
