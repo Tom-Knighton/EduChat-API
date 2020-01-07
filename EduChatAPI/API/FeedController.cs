@@ -22,7 +22,7 @@ namespace EduChatAPI.API
         {
             return Ok(await new FeedTasks().GetAllPostsForSubject(subjectid));
         }
-        [HttpPost("SetLikeForPost/{postid}/{userid}/{like}")]
+        [HttpPut("SetLikeForPost/{postid}/{userid}/{like}")]
         public async Task<IActionResult> SetLikeForPost(int postid, int userid, bool like)
         {
             return Ok(await new FeedTasks().SetLikeStatus(postid, userid, like));
