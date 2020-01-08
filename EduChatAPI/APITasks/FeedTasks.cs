@@ -144,5 +144,26 @@ namespace EduChatAPI.APITasks
                 return await GetPostById(PostId); //Return the new post object
             }
         }
+
+        public async Task<List<FeedComment>> GetAllCommentsForPost(int PostId)
+        {
+            using (var conn = new MySqlConnection(connString))
+            {
+                List<FeedComment> comments = new List<FeedComment>();
+                await conn.OpenAsync();
+                using (var cmd = new MySqlCommand($"SELECT * FROM feed_post_comments WHERE PostId={PostId} AND IsDeleted={false};", conn))
+                using (var reader = await cmd.ExecuteReaderAsync())
+                    while (await reader.ReadAsync())
+                        comments.Add(new FeedComment
+                        {
+                            UserId = Convert.ToInt32(reader["userId"]), PostId = Convert.ToInt32(reader["postId"]),
+                            CommentId = Convert.ToInt32(reader["commentId"]), IsAdmin = Convert.ToBoolean(reader["isAdmin"]),
+                            IsDeleted = Convert.ToBoolean(reader["isDeleted"]), Comment = reader["comment"].ToString(),
+                            user = await new UserTasks().GetUserById(Convert.ToInt32(reader["userId"]), flatten: true)
+                            
+                        });
+                return comments;
+            }
+        }
     }
 }
