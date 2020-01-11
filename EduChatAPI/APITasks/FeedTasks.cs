@@ -159,7 +159,8 @@ namespace EduChatAPI.APITasks
                             UserId = Convert.ToInt32(reader["userId"]), PostId = Convert.ToInt32(reader["postId"]),
                             CommentId = Convert.ToInt32(reader["commentId"]), IsAdmin = Convert.ToBoolean(reader["isAdmin"]),
                             IsDeleted = Convert.ToBoolean(reader["isDeleted"]), Comment = reader["comment"].ToString(),
-                            user = await new UserTasks().GetUserById(Convert.ToInt32(reader["userId"]), flatten: true)
+                            user = await new UserTasks().GetUserById(Convert.ToInt32(reader["userId"]), flatten: true),
+                            DatePosted = Convert.ToDateTime(reader["dateCommented"])
                             
                         });
                 return comments;

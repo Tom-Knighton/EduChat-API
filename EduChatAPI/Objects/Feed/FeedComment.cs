@@ -9,6 +9,7 @@ namespace EduChatAPI.Objects.Feed
         public string Comment { get; set; }
         public bool IsAdmin { get; set; }
         public bool IsDeleted { get; set; }
+        public DateTime DatePosted { get; set; }
 
         public User user { get; set; }
     }
