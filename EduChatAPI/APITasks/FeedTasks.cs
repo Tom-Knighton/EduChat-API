@@ -147,14 +147,15 @@ namespace EduChatAPI.APITasks
 
         public async Task<List<FeedComment>> GetAllCommentsForPost(int PostId)
         {
-            using (var conn = new MySqlConnection(connString))
+            using (var conn = new MySqlConnection(connString)) //Creates temporary connection
             {
-                List<FeedComment> comments = new List<FeedComment>();
-                await conn.OpenAsync();
+                List<FeedComment> comments = new List<FeedComment>(); //Empty list of FeedCommen objkects
+                await conn.OpenAsync(); //Waits for the connection to open.
                 using (var cmd = new MySqlCommand($"SELECT * FROM feed_post_comments WHERE PostId={PostId} AND IsDeleted={false};", conn))
-                using (var reader = await cmd.ExecuteReaderAsync())
-                    while (await reader.ReadAsync())
-                        comments.Add(new FeedComment
+                    //Selects all FeedComments for a specified post, that aren't deleted
+                using (var reader = await cmd.ExecuteReaderAsync()) //Wait for the command to run
+                    while (await reader.ReadAsync()) //For each row retuerned
+                        comments.Add(new FeedComment //Add the new FeedComment object to the list
                         {
                             UserId = Convert.ToInt32(reader["userId"]), PostId = Convert.ToInt32(reader["postId"]),
                             CommentId = Convert.ToInt32(reader["commentId"]), IsAdmin = Convert.ToBoolean(reader["isAdmin"]),
@@ -163,7 +164,40 @@ namespace EduChatAPI.APITasks
                             DatePosted = Convert.ToDateTime(reader["dateCommented"])
                             
                         });
-                return comments;
+                return comments; //return the list of FeedComment objects
+            }
+        }
+
+        public async Task<FeedComment> GetCommentById(int CommentId)
+        {
+            using (var conn = new MySqlConnection(connString))
+            {
+                await conn.OpenAsync();
+                using (var cmd = new MySqlCommand($"SELECT * FROM feed_post_comments WHERE CommentId={CommentId} AND IsDeleted={false};", conn))
+                using (var reader = await cmd.ExecuteReaderAsync())
+                    if (await reader.ReadAsync())
+                        return new FeedComment
+                        {
+                            UserId = Convert.ToInt32(reader["userId"]), PostId = Convert.ToInt32(reader["postId"]), CommentId = Convert.ToInt32(reader["commentId"]),
+                            IsAdmin = Convert.ToBoolean(reader["isAdmin"]), IsDeleted = Convert.ToBoolean(reader["isDeleted"]), Comment = reader["comment"].ToString(),
+                            user = await new UserTasks().GetUserById(Convert.ToInt32(reader["userId"]), flatten: true), DatePosted = Convert.ToDateTime(reader["dateCommented"])
+                        };
+                return null;
+            }
+        }
+
+        public async Task<FeedComment> CreateNewCommentForPost(int PostId, FeedComment comment, int userId)
+        {
+            using (var conn = new MySqlConnection(connString)) //Creates new temp connection
+            {
+                await conn.OpenAsync(); //Waits for connection to open
+                using (var cmd = new MySqlCommand($"INSERT INTO feed_post_comments VALUES({0}," + //Inserts new row into the table
+                    $" {userId}, {PostId}, '{comment.Comment}', {comment.IsAdmin}, {comment.IsDeleted}, '{comment.DatePosted.ToString("yyyy-MM-dd hh:mm:ss")}');", conn))
+                    //^ Inserts comment into table
+                {
+                    await cmd.ExecuteNonQueryAsync(); //Executes the command
+                    return await GetCommentById((int)cmd.LastInsertedId); //Gets the last inserted auto-increment id and gets/returns the comment
+                }
             }
         }
     }
