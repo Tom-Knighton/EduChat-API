@@ -219,6 +219,25 @@ namespace EduChatAPI.APITasks
                
             }
         }
+        public async Task<FeedPost> UploadMediaPost(FeedMediaPost post)
+        {
+            using (var conn = new MySqlConnection(connString)) //Creates new temp connection
+            {
+                await conn.OpenAsync(); //Waits for connection to open
+                using (var cmd = new MySqlCommand($"INSERT INTO feed_post VALUES({0}, 'text', {post.posterId}, {post.subjectId}, '{post.datePosted.ToString("yyyy-MM-dd hh:mm:ss")}', " +
+                    $"{Convert.ToBoolean(post.isAnnouncement)}, {Convert.ToBoolean(post.isDeleted)});", conn)) //Inserts post into feed_post
+                {
+                    await cmd.ExecuteNonQueryAsync(); //Executes that command
+                    using (var cmd2 = new MySqlCommand($"INSERT INTO feed_media_post VALUES ({cmd.LastInsertedId}, '{post.urlToPost}', {post.isVideo}," +
+                        $" '{post.postDescription}');", conn)) //Inserts the above post into feed_text_post
+                    {
+                        await cmd2.ExecuteNonQueryAsync(); //Executes the above command
+                        return await GetPostById((int)cmd.LastInsertedId);//Returns the new post object
+                    }
+                }
+
+            }
+        }
 
         public async Task<string> UploadFeedMediaAttachment(IFormFile file)
         {

@@ -54,7 +54,7 @@ namespace EduChatAPI.API
         [HttpPost("UploadMediaPost")]
         public async Task<IActionResult> UploadMediaPost([FromBody] FeedMediaPost post)
         {
-            return Ok();
+            return Ok(await new FeedTasks().UploadMediaPost(post));
         }
 
     }
