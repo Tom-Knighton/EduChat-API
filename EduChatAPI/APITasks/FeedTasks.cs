@@ -224,7 +224,7 @@ namespace EduChatAPI.APITasks
             using (var conn = new MySqlConnection(connString)) //Creates new temp connection
             {
                 await conn.OpenAsync(); //Waits for connection to open
-                using (var cmd = new MySqlCommand($"INSERT INTO feed_post VALUES({0}, 'text', {post.posterId}, {post.subjectId}, '{post.datePosted.ToString("yyyy-MM-dd hh:mm:ss")}', " +
+                using (var cmd = new MySqlCommand($"INSERT INTO feed_post VALUES({0}, 'media', {post.posterId}, {post.subjectId}, '{post.datePosted.ToString("yyyy-MM-dd hh:mm:ss")}', " +
                     $"{Convert.ToBoolean(post.isAnnouncement)}, {Convert.ToBoolean(post.isDeleted)});", conn)) //Inserts post into feed_post
                 {
                     await cmd.ExecuteNonQueryAsync(); //Executes that command
