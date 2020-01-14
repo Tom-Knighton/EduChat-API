@@ -61,5 +61,16 @@ namespace EduChatAPI.API
         { 
             return Ok(await new ChatTasks().RemoveMessage(MessageId, ChatId)); //Returns success (200) with a boolean indicating success
         }
+
+        [HttpPut("RemoveFromChat/{chatid}/{userid}")]
+        public async Task<IActionResult> RemoveUserFromChat(int chatid, int userid)
+        {
+            return Ok(await new ChatTasks().RemoveFromChat(userid, chatid));
+        }
+        [HttpPut("ModifyChatName/{chatid}/{chatname}")]
+        public async Task<IActionResult> ModifyChatName(int chatid, string chatname)
+        {
+            return Ok(await new ChatTasks().ModifyChatName(chatid, chatname));
+        }
     }
 }

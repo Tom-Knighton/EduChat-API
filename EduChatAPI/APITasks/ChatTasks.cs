@@ -177,6 +177,21 @@ namespace EduChatAPI.APITasks
 
             }
         }
+        public async Task<Chat> RemoveFromChat(int userid, int chatid)
+        {
+            using (var conn = new MySqlConnection(connString)) //creates temp connection
+            {
+                await conn.OpenAsync(); //Waits to open
+                using (var cmd = new MySqlCommand()) //new cmd
+                {
+                    cmd.Connection = conn; //sets conenction
+                    cmd.CommandText = $"INSERT INTO chat_member VALUES ({chatid}, {userid}, {false}) ON DUPLICATE KEY UPDATE chatId=VALUES(chatId), userId=VALUES(userId), isInChat=VALUES(isInChat);";
+                    await cmd.ExecuteNonQueryAsync(); //< executes ^ 
+                    return await GetChatById(chatid); //returns new chat object
+                }
+
+            }
+        }
 
         public async Task<ChatMessage> AddMessageToChat(ChatMessage msg, int chatId)
         {
@@ -219,6 +234,19 @@ namespace EduChatAPI.APITasks
                 await file.CopyToAsync(stream); //Creates the file at the filePath;
             }
             return $"https://cdn.tomk.online/ChatAttachments/{chatId}/{file.FileName}";
+        }
+
+        public async Task<Chat> ModifyChatName(int chatid, string name)
+        {
+            using (var conn = new MySqlConnection(connString)) //Creates new connection
+            {
+                await conn.OpenAsync(); //Waits to open
+                using (var cmd = new MySqlCommand($"UPDATE chat SET `chatName` = '{name}' WHERE `chatId`={chatid};", conn))
+                { //^ Updates chatName on the specified row
+                    await cmd.ExecuteNonQueryAsync(); //waits for cmd to execute
+                    return await GetChatById(chatid); //Returns the new chat object
+                }
+            }
         }
     }
 }
