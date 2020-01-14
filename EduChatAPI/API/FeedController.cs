@@ -39,6 +39,13 @@ namespace EduChatAPI.API
             return Ok(await new FeedTasks().CreateNewCommentForPost(postid, comment, userid));
         }
 
+        [HttpPost("UploadFeedMediaAttachment")]
+        public async Task<IActionResult> UploadFeedMediaAttachment()
+        {
+            if (HttpContext.Request.Form.Files.Count > 0) { return Ok(await new FeedTasks().UploadFeedMediaAttachment(HttpContext.Request.Form.Files[0])); }
+            return BadRequest();
+        }
+
         [HttpPost("UploadTextPost")]
         public async Task<IActionResult> UploadTextPost([FromBody] FeedTextPost post)
         {

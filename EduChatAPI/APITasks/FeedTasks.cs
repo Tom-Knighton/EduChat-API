@@ -219,5 +219,16 @@ namespace EduChatAPI.APITasks
                
             }
         }
+
+        public async Task<string> UploadFeedMediaAttachment(IFormFile file)
+        {
+            string uuid = Guid.NewGuid().ToString();
+            Directory.CreateDirectory("/var/www/cdn/FeedAttachments/Media/");
+            string newFileName = file.FileName.Replace(Path.GetFileNameWithoutExtension(file.FileName), uuid);
+            var filePath = $"/var/www/cdn/FeedAttachments/Media/{newFileName}";
+            using (var stream = new FileStream(filePath, FileMode.Create))
+                await file.CopyToAsync(stream);
+            return $"https://cdn.tomk.online/FeedAttachments/Media/{newFileName}";
+        }
     }
 }
