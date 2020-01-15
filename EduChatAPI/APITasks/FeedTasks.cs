@@ -45,6 +45,10 @@ namespace EduChatAPI.APITasks
                                  FeedMediaPost mPost = Json.Parse<FeedMediaPost>(json); //Convert the abve json intoa FeedMediaPost object
                                  mPost = await AddMediaPostValues(mPost); //Create a new object from the above, with our additional media values
                                  return mPost; //return it
+                            case "poll":
+                                FeedPoll pPost = Json.Parse<FeedPoll>(json);
+                                pPost = await AddPollPostValues(pPost);
+                                return pPost;
                             default: return null; //If the switch statement fails, return nothing.
                         }
                     }
@@ -109,6 +113,66 @@ namespace EduChatAPI.APITasks
                     } 
                 }
                 return null; //Else, return nothing.
+            }
+        }
+
+        public async Task<FeedPoll> AddPollPostValues(FeedPoll post)
+        {
+            using (var conn = new MySqlConnection(connString))
+            {
+                await conn.OpenAsync();
+                using (var cmd = new MySqlCommand($"SELECT * FROM feed_poll WHERE `PostId`={post.postId};", conn))
+                using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    if (await reader.ReadAsync())
+                    {
+                        post.PollQuestion = reader["pollQuestion"].ToString();
+                        post.Answers = await AddPollAnswers(post);
+                        return post;
+                    }
+                }
+                return null;
+            }
+        }
+        public async Task<List<FeedAnswer>> AddPollAnswers(FeedPoll post)
+        {
+            using (var conn = new MySqlConnection(connString))
+            {
+                List<FeedAnswer> answers = new List<FeedAnswer>();
+                await conn.OpenAsync();
+                using (var cmd = new MySqlCommand($"SELECT * FROM feed_poll_answer WHERE `PostId`={post.postId};", conn))
+                using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        answers.Add(new FeedAnswer
+                        {
+                            AnswerId = Convert.ToInt32(reader["answerId"]), PostId = post.postId, Answer = reader["answer"].ToString(),
+                            Votes = await AddPollVotes(Convert.ToInt32(reader["answerId"]))
+                        });
+                    }
+                }
+                return answers;
+            }
+        }
+        public async Task<List<FeedAnswerVote>> AddPollVotes(int answerId)
+        {
+            using (var conn = new MySqlConnection(connString))
+            {
+                List<FeedAnswerVote> votes = new List<FeedAnswerVote>();
+                await conn.OpenAsync();
+                using (var cmd = new MySqlCommand($"SELECT * FROM feed_poll_vote WHERE `AnswerId`={answerId} AND IsDeleted={false};", conn))
+                using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        votes.Add(new FeedAnswerVote
+                        {
+                            AnswerId = answerId, IsDeleted = false, UserId = Convert.ToInt32(reader["userId"])
+                        });
+                    }
+                }
+                return votes;
             }
         }
 
@@ -249,5 +313,10 @@ namespace EduChatAPI.APITasks
                 await file.CopyToAsync(stream);
             return $"https://cdn.tomk.online/FeedAttachments/Media/{newFileName}";
         }
+
+
+
+        //POLL:
+                
     }
 }

@@ -31,4 +31,24 @@ namespace EduChatAPI.Objects.Feed
     {
         public string postText { get; set; }
     }
+
+
+    public class FeedPoll : FeedPost // Exends FeedPost
+    {
+        public string PollQuestion { get; set; }
+        public List<FeedAnswer> Answers { get; set; }
+    }
+    public class FeedAnswer
+    {
+        public int AnswerId { get; set; }
+        public int PostId { get; set; }
+        public string Answer { get; set; }
+        public List<FeedAnswerVote> Votes { get; set; }
+    }
+    public class FeedAnswerVote
+    {
+        public int AnswerId { get; set; }
+        public int UserId { get; set; }
+        public bool IsDeleted { get; set; }
+    }
 }

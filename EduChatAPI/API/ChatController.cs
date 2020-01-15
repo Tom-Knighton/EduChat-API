@@ -67,10 +67,10 @@ namespace EduChatAPI.API
         {
             return Ok(await new ChatTasks().RemoveFromChat(userid, chatid));
         }
-        [HttpPut("ModifyChatName/{chatid}/{chatname}")]
-        public async Task<IActionResult> ModifyChatName(int chatid, string chatname)
+        [HttpPut("ModifyChatName/{chatid}")]
+        public async Task<IActionResult> ModifyChatName(int chatid, [FromBody] string name)
         {
-            return Ok(await new ChatTasks().ModifyChatName(chatid, chatname));
+            return Ok(await new ChatTasks().ModifyChatName(chatid, name));
         }
     }
 }

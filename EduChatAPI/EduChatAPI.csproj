@@ -23,4 +23,8 @@
     <Folder Include="Objects\Chat\" />
     <Folder Include="Objects\Feed\" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Objects\Feed\FeedPoll.cs" />
+    <Compile Remove="Objects\Feed\FeedPoll.cs" />
+  </ItemGroup>
 </Project>
