@@ -45,10 +45,10 @@ namespace EduChatAPI.APITasks
                                  FeedMediaPost mPost = Json.Parse<FeedMediaPost>(json); //Convert the abve json intoa FeedMediaPost object
                                  mPost = await AddMediaPostValues(mPost); //Create a new object from the above, with our additional media values
                                  return mPost; //return it
-                            case "poll":
-                                FeedPoll pPost = Json.Parse<FeedPoll>(json);
-                                pPost = await AddPollPostValues(pPost);
-                                return pPost;
+                            case "poll": //If it is a poll
+                                FeedPoll pPost = Json.Parse<FeedPoll>(json); //Convert above json to a FeedPoll object
+                                pPost = await AddPollPostValues(pPost); //Create a new object from the above, including additional values
+                                return pPost; //return it
                             default: return null; //If the switch statement fails, return nothing.
                         }
                     }
@@ -118,61 +118,64 @@ namespace EduChatAPI.APITasks
 
         public async Task<FeedPoll> AddPollPostValues(FeedPoll post)
         {
-            using (var conn = new MySqlConnection(connString))
+            using (var conn = new MySqlConnection(connString)) //New connection
             {
-                await conn.OpenAsync();
+                await conn.OpenAsync(); //Waits to open
                 using (var cmd = new MySqlCommand($"SELECT * FROM feed_poll WHERE `PostId`={post.postId};", conn))
-                using (var reader = await cmd.ExecuteReaderAsync())
+                    //^ Selects all data from feed_poll for our post
+                using (var reader = await cmd.ExecuteReaderAsync()) //reads the data
                 {
-                    if (await reader.ReadAsync())
+                    if (await reader.ReadAsync()) //IF we found anything
                     {
                         post.PollQuestion = reader["pollQuestion"].ToString();
-                        post.Answers = await AddPollAnswers(post);
-                        return post;
+                        post.Answers = await AddPollAnswers(post.postId);
+                        return post; //Add the poll attributes to the post object
                     }
                 }
-                return null;
+                return null; //else return nothing
             }
         }
-        public async Task<List<FeedAnswer>> AddPollAnswers(FeedPoll post)
+        public async Task<List<FeedAnswer>> AddPollAnswers(int postId)
         {
-            using (var conn = new MySqlConnection(connString))
+            using (var conn = new MySqlConnection(connString)) //New connection
             {
-                List<FeedAnswer> answers = new List<FeedAnswer>();
-                await conn.OpenAsync();
-                using (var cmd = new MySqlCommand($"SELECT * FROM feed_poll_answer WHERE `PostId`={post.postId};", conn))
-                using (var reader = await cmd.ExecuteReaderAsync())
+                List<FeedAnswer> answers = new List<FeedAnswer>(); //Empty list
+                await conn.OpenAsync(); //Opens connection
+                using (var cmd = new MySqlCommand($"SELECT * FROM feed_poll_answer WHERE `PostId`={postId};", conn))
+                    //^ Selects all answers from the table
+                using (var reader = await cmd.ExecuteReaderAsync()) //Reads data
                 {
-                    while (await reader.ReadAsync())
+                    while (await reader.ReadAsync()) //For each row returned
                     {
-                        answers.Add(new FeedAnswer
+                        answers.Add(new FeedAnswer //Add a new FeedAnswer object to our list
                         {
-                            AnswerId = Convert.ToInt32(reader["answerId"]), PostId = post.postId, Answer = reader["answer"].ToString(),
+                            AnswerId = Convert.ToInt32(reader["answerId"]), PostId = postId, Answer = reader["answer"].ToString(),
                             Votes = await AddPollVotes(Convert.ToInt32(reader["answerId"]))
                         });
                     }
                 }
-                return answers;
+                return answers; //return the list
             }
         }
         public async Task<List<FeedAnswerVote>> AddPollVotes(int answerId)
         {
-            using (var conn = new MySqlConnection(connString))
+            using (var conn = new MySqlConnection(connString)) //New connection
             {
-                List<FeedAnswerVote> votes = new List<FeedAnswerVote>();
-                await conn.OpenAsync();
+                List<FeedAnswerVote> votes = new List<FeedAnswerVote>(); //Empty list
+                await conn.OpenAsync(); //waits to open
                 using (var cmd = new MySqlCommand($"SELECT * FROM feed_poll_vote WHERE `AnswerId`={answerId} AND IsDeleted={false};", conn))
-                using (var reader = await cmd.ExecuteReaderAsync())
+                    //^ Selects all non deleted votes for each answer
+                using (var reader = await cmd.ExecuteReaderAsync()) //Reads data
                 {
-                    while (await reader.ReadAsync())
+                    while (await reader.ReadAsync()) //FOr each row
                     {
-                        votes.Add(new FeedAnswerVote
+                        votes.Add(new FeedAnswerVote //Add a new FeedAnswerVote object to list
                         {
                             AnswerId = answerId, IsDeleted = false, UserId = Convert.ToInt32(reader["userId"])
                         });
                     }
                 }
-                return votes;
+                return votes; //return the list
             }
         }
 
@@ -317,6 +320,16 @@ namespace EduChatAPI.APITasks
 
 
         //POLL:
-                
+        public async Task<List<FeedAnswer>> VoteForPoll(int userid, int answerid, int pollid)
+        {
+            using (var conn = new MySqlConnection(connString)) //New connection
+            {
+                await conn.OpenAsync(); //waits for connection to open
+                using (var cmd = new MySqlCommand($"INSERT INTO feed_poll_vote VALUES({answerid}, {userid}, {false}) ON DUPLICATE KEY UPDATE IsDeleted={false};", conn))
+                    //^ inserts vote into row, if it already exists, just set isdeleted to false
+                    await cmd.ExecuteNonQueryAsync(); //Execute command
+                return await AddPollAnswers(pollid); //Return list of answers with votes for poll
+            }
+        }        
     }
 }
