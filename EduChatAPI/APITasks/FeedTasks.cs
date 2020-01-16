@@ -337,7 +337,7 @@ namespace EduChatAPI.APITasks
             using (var conn = new MySqlConnection(connString))
             {
                 await conn.OpenAsync(); //Waits for connection to open
-                using (var cmd = new MySqlCommand($"INSERT INTO feed_post VALUES({0}, 'text', {poll.posterId}, {poll.subjectId}, '{poll.datePosted.ToString("yyyy-MM-dd hh:mm:ss")}', " +
+                using (var cmd = new MySqlCommand($"INSERT INTO feed_post VALUES({0}, 'poll', {poll.posterId}, {poll.subjectId}, '{poll.datePosted.ToString("yyyy-MM-dd hh:mm:ss")}', " +
                     $"{Convert.ToBoolean(poll.isAnnouncement)}, {Convert.ToBoolean(poll.isDeleted)});", conn)) //Inserts post into feed_post
                 {
                     await cmd.ExecuteNonQueryAsync(); //Executes that command
