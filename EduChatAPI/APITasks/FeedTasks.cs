@@ -332,7 +332,7 @@ namespace EduChatAPI.APITasks
             }
         }
 
-        public async Task<FeedPoll> UploadPollPost(FeedPoll poll)
+        public async Task<FeedPost> UploadPollPost(FeedPoll poll)
         {
             using (var conn = new MySqlConnection(connString))
             {
@@ -351,7 +351,7 @@ namespace EduChatAPI.APITasks
                     }
                     using (var cmd3 = new MySqlCommand(answersCommand, conn))
                         await cmd3.ExecuteNonQueryAsync();
-                    return await GetPostById(id) as FeedPoll;
+                    return await GetPostById(id);
                 }
             }
         }
