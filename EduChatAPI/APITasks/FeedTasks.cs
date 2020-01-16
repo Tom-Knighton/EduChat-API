@@ -316,7 +316,7 @@ namespace EduChatAPI.APITasks
                 await file.CopyToAsync(stream);
             return $"https://cdn.tomk.online/FeedAttachments/Media/{newFileName}";
         }
-
+         
 
 
         //POLL:
@@ -330,6 +330,30 @@ namespace EduChatAPI.APITasks
                     await cmd.ExecuteNonQueryAsync(); //Execute command
                 return await AddPollAnswers(pollid); //Return list of answers with votes for poll
             }
-        }        
+        }
+
+        public async Task<FeedPoll> UploadPollPost(FeedPoll poll)
+        {
+            using (var conn = new MySqlConnection(connString))
+            {
+                await conn.OpenAsync(); //Waits for connection to open
+                using (var cmd = new MySqlCommand($"INSERT INTO feed_post VALUES({0}, 'text', {poll.posterId}, {poll.subjectId}, '{poll.datePosted.ToString("yyyy-MM-dd hh:mm:ss")}', " +
+                    $"{Convert.ToBoolean(poll.isAnnouncement)}, {Convert.ToBoolean(poll.isDeleted)});", conn)) //Inserts post into feed_post
+                {
+                    await cmd.ExecuteNonQueryAsync(); //Executes that command
+                    int id = (int)cmd.LastInsertedId;
+                    using (var cmd2 = new MySqlCommand($"INSERT INTO feed_poll VALUES({id}, '{poll.PollQuestion}');", conn))
+                        await cmd2.ExecuteNonQueryAsync();
+                    string answersCommand = "";
+                    foreach (FeedAnswer answer in poll.Answers)
+                    {
+                        answersCommand += $" INSERT INTO feed_poll_answer VALUES({0}, {id}, '{answer.Answer}');";
+                    }
+                    using (var cmd3 = new MySqlCommand(answersCommand, conn))
+                        await cmd3.ExecuteNonQueryAsync();
+                    return await GetPostById(id) as FeedPoll;
+                }
+            }
+        }
     }
 }

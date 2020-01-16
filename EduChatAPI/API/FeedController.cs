@@ -58,11 +58,16 @@ namespace EduChatAPI.API
         }
 
 
-        //FEED:
+        //Poll:
         [HttpPut("VoteForPoll/{userid}/{answerid}/{pollid}")]
         public async Task<IActionResult> VoteForPoll(int userid, int answerid, int pollid)
         {
             return Ok(await new FeedTasks().VoteForPoll(userid, answerid, pollid));
+        }
+        [HttpPost("UploadPoll")]
+        public async Task<IActionResult> UploadPoll([FromBody] FeedPoll poll)
+        {
+            return Ok(await new FeedTasks().UploadPollPost(poll));
         }
 
     }
