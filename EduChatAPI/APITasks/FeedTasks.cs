@@ -49,6 +49,10 @@ namespace EduChatAPI.APITasks
                                 FeedPoll pPost = Json.Parse<FeedPoll>(json); //Convert above json to a FeedPoll object
                                 pPost = await AddPollPostValues(pPost); //Create a new object from the above, including additional values
                                 return pPost; //return it
+                            case "quiz":
+                                FeedQuiz fPost = Json.Parse<FeedQuiz>(json); //Convert json into FeedQuiz object
+                                fPost = await AddBasicQuizValues(fPost); //Adds quiz values
+                                return fPost; //return it
                             default: return null; //If the switch statement fails, return nothing.
                         }
                     }
@@ -113,6 +117,26 @@ namespace EduChatAPI.APITasks
                     } 
                 }
                 return null; //Else, return nothing.
+            }
+        }
+
+        public async Task<FeedQuiz> AddBasicQuizValues(FeedQuiz quiz)
+        {
+            using (var conn = new MySqlConnection(connString)) //New connection
+            {
+                await conn.OpenAsync(); //Waits to open
+                using (var cmd = new MySqlCommand($"SELECT * FROM feed_quiz WHERE `PostId`={quiz.postId};", conn))
+                //^ Selects all data from feed_quiz for our post
+                using (var reader = await cmd.ExecuteReaderAsync()) //reads the data
+                {
+                    if (await reader.ReadAsync()) //IF we found anything
+                    {
+                        quiz.QuizTitle = reader["postTitle"].ToString();
+                        quiz.DifficultyLevel = reader["overallDifficulty"].ToString();
+                        return quiz;
+                    }
+                }
+                return null; //else return nothing
             }
         }
 
@@ -334,24 +358,24 @@ namespace EduChatAPI.APITasks
 
         public async Task<FeedPost> UploadPollPost(FeedPoll poll)
         {
-            using (var conn = new MySqlConnection(connString))
+            using (var conn = new MySqlConnection(connString)) //New connection
             {
                 await conn.OpenAsync(); //Waits for connection to open
                 using (var cmd = new MySqlCommand($"INSERT INTO feed_post VALUES({0}, 'poll', {poll.posterId}, {poll.subjectId}, '{poll.datePosted.ToString("yyyy-MM-dd hh:mm:ss")}', " +
                     $"{Convert.ToBoolean(poll.isAnnouncement)}, {Convert.ToBoolean(poll.isDeleted)});", conn)) //Inserts post into feed_post
                 {
                     await cmd.ExecuteNonQueryAsync(); //Executes that command
-                    int id = (int)cmd.LastInsertedId;
+                    int id = (int)cmd.LastInsertedId; //Gets the last inserted auto incremented id
                     using (var cmd2 = new MySqlCommand($"INSERT INTO feed_poll VALUES({id}, '{poll.PollQuestion}');", conn))
-                        await cmd2.ExecuteNonQueryAsync();
-                    string answersCommand = "";
-                    foreach (FeedAnswer answer in poll.Answers)
-                    {
+                        await cmd2.ExecuteNonQueryAsync(); //Inserts value into feed_poll values
+                    string answersCommand = ""; //Sets up an empty string
+                    foreach (FeedAnswer answer in poll.Answers) //For each answer in the answers array
+                    { // Add to the answersCommand string, insert each feed_poll_answer row
                         answersCommand += $" INSERT INTO feed_poll_answer VALUES({0}, {id}, '{answer.Answer}');";
                     }
-                    using (var cmd3 = new MySqlCommand(answersCommand, conn))
+                    using (var cmd3 = new MySqlCommand(answersCommand, conn)) //Executes all the commands above
                         await cmd3.ExecuteNonQueryAsync();
-                    return await GetPostById(id);
+                    return await GetPostById(id); //Returns the FeedPoll object
                 }
             }
         }
