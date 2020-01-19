@@ -125,7 +125,7 @@ namespace EduChatAPI.APITasks
             using (var conn = new MySqlConnection(connString)) //New connection
             {
                 await conn.OpenAsync(); //Waits to open
-                using (var cmd = new MySqlCommand($"SELECT * FROM feed_quiz WHERE `PostId`={quiz.postId};", conn))
+                using (var cmd = new MySqlCommand($"SELECT * FROM feed_quiz_post WHERE `PostId`={quiz.postId};", conn))
                 //^ Selects all data from feed_quiz for our post
                 using (var reader = await cmd.ExecuteReaderAsync()) //reads the data
                 {
