@@ -399,7 +399,9 @@ namespace EduChatAPI.APITasks
                             PostId = QuizId, QuestionId = Convert.ToInt32(qReader["questionId"]),
                             CorrectAnswer = qReader["correctAnswer"].ToString(),
                             Answers = new List<string> { qReader["answer1"].ToString(), qReader["answer2"].ToString(),
-                               qReader["answer3"].ToString(), qReader["answer4"].ToString() }
+                               qReader["answer3"].ToString(), qReader["answer4"].ToString() },
+                            Difficulty = Convert.ToInt32(qReader["questionDifficulty"]),
+                            Question = qReader["question"].ToString()
                         });
 
                     }
@@ -417,8 +419,8 @@ namespace EduChatAPI.APITasks
                             user = await new UserTasks().GetUserById(Convert.ToInt32(rReader["userId"]), flatten: true)
                         });
                     }
-                    quiz.Questions = questions; quiz.Results = results;
-                    return quiz;
+                    quiz.Questions = questions; quiz.Results = results; //Adds questions and results
+                    return quiz; //Returns modified quiz object
                 }
             }
         }

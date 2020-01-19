@@ -15,9 +15,11 @@ namespace EduChatAPI.Objects.Feed
     public class FeedQuizQuestion
     {
         public int QuestionId { get; set; }
+        public string Question { get; set; }
         public int PostId { get; set; }
         public List<string> Answers { get; set; }
         public string CorrectAnswer { get; set; }
+        public int Difficulty { get; set; }
     }
     public class FeedQuizResult
     {
