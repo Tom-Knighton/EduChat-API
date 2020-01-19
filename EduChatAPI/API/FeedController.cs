@@ -70,5 +70,12 @@ namespace EduChatAPI.API
             return Ok(await new FeedTasks().UploadPollPost(poll));
         }
 
+        //Quiz:
+        [HttpGet("GetFullFeedQuiz/{QuizId}")]
+        public async Task<IActionResult> GetFullFeedQuiz(int QuizId)
+        {
+            return Ok(await new FeedTasks().GetFullFeedQuiz(QuizId));
+        }
+
     }
 }

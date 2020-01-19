@@ -379,5 +379,48 @@ namespace EduChatAPI.APITasks
                 }
             }
         }
+
+        //QUIZ:
+        public async Task<FeedQuiz> GetFullFeedQuiz(int QuizId)
+        {
+            FeedQuiz quiz = (FeedQuiz) await GetPostById(QuizId); //Gets base FeedPost obkect
+            List<FeedQuizQuestion> questions = new List<FeedQuizQuestion>();
+            List<FeedQuizResult> results = new List<FeedQuizResult>();
+            using (var conn = new MySqlConnection(connString)) //New connection
+            {
+                await conn.OpenAsync(); //Waits for connection to open
+                using (var questionsCmd = new MySqlCommand($"SELECT * FROM feed_quiz_question WHERE PostId={QuizId};", conn))
+                    // ^ selects all rows in the question table for this quiz 
+                using (var qReader = await questionsCmd.ExecuteReaderAsync()) //reads the data
+                    while (await qReader.ReadAsync()) //For each row returndd
+                    {
+                        questions.Add(new FeedQuizQuestion //Add a new Question object to the array
+                        {
+                            PostId = QuizId, QuestionId = Convert.ToInt32(qReader["questionId"]),
+                            CorrectAnswer = qReader["correctAnswer"].ToString(),
+                            Answers = new List<string> { qReader["answer1"].ToString(), qReader["answer2"].ToString(),
+                               qReader["answer3"].ToString(), qReader["answer4"].ToString() }
+                        });
+
+                    }
+                using (var resultsCmd = new MySqlCommand($"SELECT * FROM feed_quiz_result WHERE PostId={QuizId};", conn))
+                // ^ Selects all rows in the result table for this quiz
+                using (var rReader = await resultsCmd.ExecuteReaderAsync())
+                { //Reads the data
+                    while (await rReader.ReadAsync())
+                    { //For each row returned
+                        results.Add(new FeedQuizResult //Adds a new Result object to the array
+                        {
+                            PostId = QuizId,
+                            UserId = Convert.ToInt32(rReader["userId"]),
+                            OverallScore = Convert.ToInt32(rReader["overallScore"]),
+                            user = await new UserTasks().GetUserById(Convert.ToInt32(rReader["userId"]), flatten: true)
+                        });
+                    }
+                    quiz.Questions = questions; quiz.Results = results;
+                    return quiz;
+                }
+            }
+        }
     }
 }
