@@ -416,7 +416,8 @@ namespace EduChatAPI.APITasks
                             PostId = QuizId,
                             UserId = Convert.ToInt32(rReader["userId"]),
                             OverallScore = Convert.ToInt32(rReader["overallScore"]),
-                            User = await new UserTasks().GetUserById(Convert.ToInt32(rReader["userId"]), flatten: true)
+                            User = await new UserTasks().GetUserById(Convert.ToInt32(rReader["userId"]), flatten: true),
+                            DatePosted = Convert.ToDateTime(rReader["datePosted"])
                         });
                     }
                     quiz.Questions = questions; quiz.Results = results; //Adds questions and results
