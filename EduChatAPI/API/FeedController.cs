@@ -76,6 +76,21 @@ namespace EduChatAPI.API
         {
             return Ok(await new FeedTasks().GetFullFeedQuiz(QuizId));
         }
-
+        [HttpGet("GetQuizResultById/{ResultId}")]
+        public async Task<IActionResult> GetQuizResultById(int ResultId)
+        {
+            return Ok(await new FeedTasks().GetQuizResultById(ResultId));
+        }
+        [HttpPost("CreateQuizResult/{PostId}")]
+        public async Task<IActionResult> CreateQuizResult(int PostId, [FromBody] FeedQuizResult result)
+        {
+            
+            return Ok(await new FeedTasks().CreateQuizResult(result, PostId));
+        }
+        [HttpPost("UploadQuiz")]
+        public async Task<IActionResult> UploadQuiz([FromBody] FeedQuiz quiz)
+        {
+            return Ok(await new FeedTasks().UploadQuizPost(quiz));
+        }
     }
 }

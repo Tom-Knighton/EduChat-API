@@ -26,6 +26,7 @@ namespace EduChatAPI.Objects.Feed
         public int PostId { get; set; }
         public int UserId { get; set; }
         public int OverallScore { get; set; }
-        public User user { get; set; }
+        public DateTime DatePosted { get; set; }
+        public User User { get; set; }
     }
 }

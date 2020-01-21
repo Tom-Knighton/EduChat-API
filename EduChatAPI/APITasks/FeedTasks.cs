@@ -416,7 +416,7 @@ namespace EduChatAPI.APITasks
                             PostId = QuizId,
                             UserId = Convert.ToInt32(rReader["userId"]),
                             OverallScore = Convert.ToInt32(rReader["overallScore"]),
-                            user = await new UserTasks().GetUserById(Convert.ToInt32(rReader["userId"]), flatten: true)
+                            User = await new UserTasks().GetUserById(Convert.ToInt32(rReader["userId"]), flatten: true)
                         });
                     }
                     quiz.Questions = questions; quiz.Results = results; //Adds questions and results
@@ -424,5 +424,66 @@ namespace EduChatAPI.APITasks
                 }
             }
         }
+
+        public async Task<FeedQuizResult> GetQuizResultById(int id)
+        {
+            using (var conn = new MySqlConnection(connString))
+            {
+                await conn.OpenAsync();
+                using (var cmd = new MySqlCommand($"SELECT * FROM feed_quiz_result WHERE ResultId={id};", conn))
+                using (var reader = await cmd.ExecuteReaderAsync())
+                    if (await reader.ReadAsync())
+                    {
+                        return new FeedQuizResult
+                        {
+                            PostId = Convert.ToInt32(reader["postId"]), UserId = Convert.ToInt32(reader["userId"]),
+                            OverallScore = Convert.ToInt32(reader["overallScore"]), DatePosted = Convert.ToDateTime(reader["datePosted"]),
+                            User = await new UserTasks().GetUserById(Convert.ToInt32(reader["userId"]), flatten: true)
+                        };
+                    }
+                return null;
+
+
+            }
+        }
+
+        public async Task<FeedQuizResult> CreateQuizResult(FeedQuizResult result, int QuizId)
+        {
+            using (var conn = new MySqlConnection(connString)) //New temporary connection
+            { 
+                await conn.OpenAsync(); //Opens connection
+                using (var cmd = new MySqlCommand($"INSERT INTO feed_quiz_result VALUES({0}, {10}, {result.UserId}, {result.OverallScore}, '{result.DatePosted.ToString("yyyy-MM-dd hh:mm:ss")}');", conn))
+                { //^ inserts values into feed_quiz_result row
+                    await cmd.ExecuteNonQueryAsync(); //Executes command
+                    return await GetQuizResultById((int)cmd.LastInsertedId); //Get returned reuslt row
+                }
+            }
+        }
+
+        public async Task<FeedPost> UploadQuizPost(FeedQuiz quiz)
+        {
+            using (var conn = new MySqlConnection(connString)) //New connection
+            {
+                await conn.OpenAsync(); //Waits for connection to open
+                using (var cmd = new MySqlCommand($"INSERT INTO feed_post VALUES({0}, 'quiz', {quiz.posterId}, {quiz.subjectId}, '{quiz.datePosted.ToString("yyyy-MM-dd hh:mm:ss")}', " +
+                    $"{Convert.ToBoolean(quiz.isAnnouncement)}, {Convert.ToBoolean(quiz.isDeleted)});", conn)) //Inserts post into feed_post
+                {
+                    await cmd.ExecuteNonQueryAsync(); //Executes that command
+                    int id = (int)cmd.LastInsertedId; //Gets the last inserted auto incremented id
+                    using (var cmd2 = new MySqlCommand($"INSERT INTO feed_quiz_post VALUES({id}, '{quiz.QuizTitle}', '{quiz.DifficultyLevel}');", conn))
+                        await cmd2.ExecuteNonQueryAsync(); //Inserts value into feed_quiz_post values
+                    string questionsCommand = ""; //Sets up an empty string
+                    foreach (FeedQuizQuestion question in quiz.Questions) //For each question in the questions array
+                    { // Add to the questionsCommand string, insert each feed_quiz_question row
+                        questionsCommand += $" INSERT INTO feed_quiz_question VALUES({0}, {id}, '{question.Question}', " +
+                            $"'{question.Answers[0]}', '{question.Answers[1]}', '{question.Answers[2]}', '{question.Answers[3]}', '{question.CorrectAnswer}', {question.Difficulty});";
+                    }
+                    using (var cmd3 = new MySqlCommand(questionsCommand, conn)) //Executes all the commands above
+                        await cmd3.ExecuteNonQueryAsync();
+                    return await GetPostById(id); //Returns the FeedQuiz object
+                }
+            }
+        }
+       
     }
 }
