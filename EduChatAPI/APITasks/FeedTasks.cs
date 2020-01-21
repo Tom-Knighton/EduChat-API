@@ -452,7 +452,7 @@ namespace EduChatAPI.APITasks
             using (var conn = new MySqlConnection(connString)) //New temporary connection
             { 
                 await conn.OpenAsync(); //Opens connection
-                using (var cmd = new MySqlCommand($"INSERT INTO feed_quiz_result VALUES({0}, {10}, {result.UserId}, {result.OverallScore}, '{result.DatePosted.ToString("yyyy-MM-dd hh:mm:ss")}');", conn))
+                using (var cmd = new MySqlCommand($"INSERT INTO feed_quiz_result VALUES({0}, {QuizId}, {result.UserId}, {result.OverallScore}, '{result.DatePosted.ToString("yyyy-MM-dd hh:mm:ss")}');", conn))
                 { //^ inserts values into feed_quiz_result row
                     await cmd.ExecuteNonQueryAsync(); //Executes command
                     return await GetQuizResultById((int)cmd.LastInsertedId); //Get returned reuslt row
