@@ -83,6 +83,10 @@ namespace EduChatAPI.API
         {
             return Ok(await new UserTasks().UnsubscribeUserToSubjects(UserId, SubjectIds));
         }
-
+        [HttpGet("GetAllPostsForUser/{UserId}")]
+        public async Task<IActionResult> GetAllPostsForUser(int UserId)
+        {
+            return Ok(await new FeedTasks().GetAllPostsForUser(UserId));
+        }
     }
 }

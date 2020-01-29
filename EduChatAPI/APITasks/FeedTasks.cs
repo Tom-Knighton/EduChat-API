@@ -80,6 +80,24 @@ namespace EduChatAPI.APITasks
             return posts;
         }
 
+        public async Task<List<FeedPost>> GetAllPostsForUser(int userid)
+        {
+            List<FeedPost> posts = new List<FeedPost>(); //Initialises list of FeedPosts
+            using (var conn = new MySqlConnection(connString)) //New connection
+            {
+                await conn.OpenAsync(); //Waits for connection to open
+                using (MySqlCommand cmd = new MySqlCommand($"SELECT * FROM feed_post WHERE `PosterId`={userid} AND IsDeleted={false};", conn))
+                // Selects all not deleted posts from the user selected
+                using (var reader = await cmd.ExecuteReaderAsync())
+                while (await reader.ReadAsync()) //For each row
+                {
+                    posts.Add(await GetPostById(Convert.ToInt32(reader["postId"]))); //Get Post object
+                }
+            }
+            posts.Sort((x, y) => y.datePosted.CompareTo(x.datePosted)); //Sort by date posted
+            return posts; //return list
+        }
+
         public async Task<FeedTextPost> AddTextPostValues(FeedTextPost post)
         {
             using (var conn = new MySqlConnection(connString)) //New connection
