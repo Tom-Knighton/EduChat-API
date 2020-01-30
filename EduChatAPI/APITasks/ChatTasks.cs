@@ -22,7 +22,7 @@ namespace EduChatAPI.APITasks
                 using (var cmd = new MySqlCommand())
                 {
                     cmd.Connection = conn;
-                    cmd.CommandText = $"INSERT INTO chat VALUES({0}, '{chat.ChatName}', {chat.isProtected}, {chat.isPublic}, {chat.isDeleted}, {chat.DateCreated.ToString("yyyy-MM-dd hh:mm:ss")});";
+                    cmd.CommandText = $"INSERT INTO chat VALUES({0}, '{chat.ChatName}', {chat.isProtected}, {chat.isPublic}, {chat.isDeleted}, '{chat.DateCreated.ToString("yyyy-MM-dd hh:mm:ss")}');";
                     await cmd.ExecuteNonQueryAsync();
                     chat.ChatId = (int)cmd.LastInsertedId;
                     foreach (int m in chat.memberIds) { await AddToChat(m, chat.ChatId); }
