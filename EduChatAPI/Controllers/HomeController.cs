@@ -34,6 +34,11 @@ namespace EduChatAPI.Controllers
             return View();
         }
 
+        public IActionResult Beta()
+        {
+            return Redirect("https://testflight.apple.com/join/iw7JHg14");
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

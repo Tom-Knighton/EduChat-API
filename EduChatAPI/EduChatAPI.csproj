@@ -26,5 +26,6 @@
   <ItemGroup>
     <Compile Remove="Objects\Feed\FeedPoll.cs" />
     <Compile Remove="Objects\Feed\FeedPoll.cs" />
+    <Compile Remove="APITasks\IFormFilefile.cs" />
   </ItemGroup>
 </Project>

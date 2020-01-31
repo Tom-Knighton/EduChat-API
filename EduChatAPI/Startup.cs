@@ -58,7 +58,7 @@ namespace EduChatAPI
             app.UseWebSockets();
             app.UseSignalR(routes =>
             {
-              
+
                 routes.MapHub<ChatHub>("/ChatHub");
             });
             app.UseSwagger();
@@ -69,6 +69,7 @@ namespace EduChatAPI
 
             app.UseMvc(routes =>
             {
+                routes.MapRoute(name: "Specific", template: "{action}/{id?}", new { controller = "Home", action = "Index"});
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
