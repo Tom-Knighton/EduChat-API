@@ -17,7 +17,7 @@ namespace EduChatAPI.APITasks
         public async Task<Chat> CreateNewChat(Chat chat)
         {
             using (var conn = new MySqlConnection(connString))
-            {
+            {                
                 await conn.OpenAsync();
                 using (var cmd = new MySqlCommand())
                 {

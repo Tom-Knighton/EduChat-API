@@ -16,6 +16,28 @@ namespace EduChatAPI.APITasks
         string connString = "server = 127.0.0.1; port=3306;database=educhat;user=db;password=Tom7494";
 
 
+        public async Task<string> GetLatestBioFor(int userid)
+        {
+            using (var conn = new MySqlConnection(connString))
+            {
+                await conn.OpenAsync();
+                using (var cmd = new MySqlCommand($"SELECT * FROM user_bio WHERE UserId={userid} AND IsCurrent={true} ORDER BY DateCreated LIMIT 1;", conn))
+                using (var reader = await cmd.ExecuteReaderAsync())
+                    if (await reader.ReadAsync()) return reader["bio"].ToString();
+                return "";
+            }
+        }
+
+        public async Task<string> UploadNewBioForUser(int userid, UserBio bio)
+        {
+            using (var conn = new MySqlConnection(connString))
+            {
+                await conn.OpenAsync();
+                using (var cmd = new MySqlCommand($"INSERT INTO user_bio VALUES({0},{userid},{bio.Bio},{true},{bio.DateCreated};", conn))
+                    await cmd.ExecuteNonQueryAsync();
+                return bio.Bio;
+            }
+        }
 
 
         public async Task<bool> IsUsernameFree(string username)
@@ -59,7 +81,8 @@ namespace EduChatAPI.APITasks
                             IsAdmin = Convert.ToBoolean(reader["IsAdmin"]), IsDeleted = Convert.ToBoolean(reader["IsDeleted"]), UserPassHash = reader["UserPassHash"].ToString(),
                             Subjects = !flatten ? await new SubjectTasks().GetSubscribedSubjects(UserId) : null,
                             Chats = !flatten ? await new ChatTasks().GetAllChatsForUser(UserId) : null,
-                            Friendships = !flatten ? await new FriendshipTasks().GetAllFriendsForUser(UserId) : null
+                            Friendships = !flatten ? await new FriendshipTasks().GetAllFriendsForUser(UserId) : null,
+                            UserBio = await GetLatestBioFor(UserId)
                         };
                     }
                     else return null;
@@ -83,7 +106,8 @@ namespace EduChatAPI.APITasks
                             IsAdmin = Convert.ToBoolean(reader["IsAdmin"]), IsDeleted = Convert.ToBoolean(reader["IsDeleted"]), UserPassHash = reader["UserPassHash"].ToString(),
                             Subjects = !flatten ? await new SubjectTasks().GetSubscribedSubjects(Convert.ToInt32(reader["UserId"])) : null,
                             Chats = !flatten ? await new ChatTasks().GetAllChatsForUser(Convert.ToInt32(reader["UserId"])) : null,
-                            Friendships = !flatten ? await new FriendshipTasks().GetAllFriendsForUser(Convert.ToInt32(reader["UserId"])) : null
+                            Friendships = !flatten ? await new FriendshipTasks().GetAllFriendsForUser(Convert.ToInt32(reader["UserId"])) : null,
+                            UserBio = await GetLatestBioFor(Convert.ToInt32(reader["UserId"]))
                         };
                     }
                     return null;

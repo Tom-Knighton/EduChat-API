@@ -20,9 +20,20 @@ namespace EduChatAPI.Objects
         public bool IsDeleted { get; set; }
         public string UserPassHash { get; set; }
 
+        public string UserBio { get; set; }
+
         public List<Subject> Subjects { get; set; }
         public List<Chat> Chats { get; set; }
         public List<Friendship> Friendships { get; set; }
         
-    }   
+    }
+
+    public class UserBio
+    {
+        public int BioId { get; set; }
+        public int UserId { get; set; }
+        public string Bio { get; set; }
+        public bool IsCurrent { get; set; }
+        public DateTime DateCreated { get; set; }
+    }
 }

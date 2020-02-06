@@ -88,5 +88,11 @@ namespace EduChatAPI.API
         {
             return Ok(await new FeedTasks().GetAllPostsForUser(UserId));
         }
+
+        [HttpPost("UploadNewBioForUser/{userid}")]
+        public async Task<IActionResult> UploadNewBio(int userid, [FromBody] UserBio bio)
+        {
+            return Ok(await new UserTasks().UploadNewBioForUser(userid, bio));
+        }
     }
 }
