@@ -33,7 +33,9 @@ namespace EduChatAPI.APITasks
             using (var conn = new MySqlConnection(connString))
             {
                 await conn.OpenAsync();
-                using (var cmd = new MySqlCommand($"INSERT INTO user_bio VALUES({0},{userid},{bio.Bio},{true},{bio.DateCreated};", conn))
+                using (var rewriteCmd = new MySqlCommand($"UPDATE user_bio SET `IsCurrent`={false} WHERE `UserId`={userid};", conn))
+                    await rewriteCmd.ExecuteNonQueryAsync();
+                using (var cmd = new MySqlCommand($"INSERT INTO user_bio VALUES ('{0}', {userid}, '{bio.Bio}', {bio.IsCurrent}, '{bio.DateCreated.ToString("yyyy-MM-dd hh:mm:ss")}');", conn))
                     await cmd.ExecuteNonQueryAsync();
                 return bio.Bio;
             }
